@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using TMPro;
+using Unity.VisualScripting.Antlr3.Runtime;
 
 public class TimingJudge : MonoBehaviour
 {
@@ -18,7 +19,6 @@ public class TimingJudge : MonoBehaviour
     void judge()
     {
         float cursorX = cursor.anchoredPosition.x;
-
         float successX = successZone.anchoredPosition.x;
 
         float successWidth = successZone.rect.width / 2f;
@@ -26,12 +26,25 @@ public class TimingJudge : MonoBehaviour
         if (cursorX >= successX - successWidth &&
             cursorX <= successX + successWidth)
         {
-            Debug.Log("¬Œ÷");
+            Success();
         }
         else
         {
-            Debug.Log("Ž¸”s");
+            Failed();
         }
     }
+    void Success() 
+    {
+         Debug.Log("¬Œ÷");
+
+        resultText.text = "SUCCELSS";
+    }
+    void Failed() 
+    {
+        Debug.Log("Ž¸”s");
+
+        resultText.text = "MISS";
+    }
+    
 }
 
