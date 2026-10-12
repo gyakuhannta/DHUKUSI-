@@ -23,7 +23,7 @@ public class DhukusiInput : MonoBehaviour
         Timing   // デュクシ繰り出しフェーズ
     }
 
-    // 【追加】ボタンの位置
+    // ボタンの位置
     public enum PadButton { North, West, East, South }
 
     [Header("状態")]
@@ -61,9 +61,9 @@ public class DhukusiInput : MonoBehaviour
     public event Action<PadButton, float> OnReleased;
 
     // 長押しの状態
-    private PadButton? heldButton = null;   // 押してなければ null
-    private float holdStartTime;            // 押し始めた時刻
-    private bool cancelFired;               // この長押しでもうキャンセルしたか
+    private PadButton? heldButton = null;   
+    private float holdStartTime;            
+    private bool cancelFired;               
 
     // 今のボタンを何秒押しているか
     public float HoldTime => heldButton.HasValue ? Time.time - holdStartTime : 0f;
