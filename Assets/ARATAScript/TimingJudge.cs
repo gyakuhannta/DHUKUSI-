@@ -10,53 +10,62 @@ public class TimingJudge : MonoBehaviour
 
     [Header("4つの成功ゾーン")]
     [SerializeField]
-    private RectTransform[] successZones =
-        new RectTransform[4];
+    private RectTransform[] successZones = new RectTransform[4];
 
     [Header("画面に表示する文字")]
     [SerializeField] private TMP_Text actionText;
 
-    // 現在カーソルが触れているゾーン
+    private readonly string[] actionNames =
+    {
+        "通常",
+        "フェイント",
+        "れんぞく",
+        "げきおも"
+    };
+
     private int currentZone = -1;
 
-    void Start()
+    private void Start()
     {
-        actionText.text = "タイミングを合わせよう！";
+        UpdateActionText();
     }
 
-    void Update()
+    private void Update()
     {
-        // カーソルがゾーンに触れているか確認
         CheckCursorZone();
 
-        // 左クリックで行動を実行
-        if (Mouse.current != null &&
-            Mouse.current.leftButton.wasPressedThisFrame)
+        // 左クリックされた瞬間だけ true になる
+        bool isClicked =
+            Mouse.current != null &&
+            Mouse.current.leftButton.wasPressedThisFrame;
+
+        if (isClicked)
         {
-            if (currentZone != -1)
-            {
-                ExecuteAction(currentZone + 1);
-            }
-            else
-            {
-                actionText.text = "失敗！";
-                Debug.Log("失敗！");
-            }
+            JudgeAction();
         }
     }
 
-    // カーソルがどのゾーンに触れているか確認
-    void CheckCursorZone()
+    // カーソルがどのゾーンにあるか判定
+    private void CheckCursorZone()
     {
+        currentZone = -1;
+
+        if (cursor == null)
+        {
+            UpdateActionText();
+            return;
+        }
+
         float cursorX = cursor.anchoredPosition.x;
-        int detectedZone = -1;
 
         for (int i = 0; i < successZones.Length; i++)
         {
             RectTransform zone = successZones[i];
 
             if (zone == null)
+            {
                 continue;
+            }
 
             float zoneX = zone.anchoredPosition.x;
             float halfWidth = zone.rect.width / 2f;
@@ -64,91 +73,91 @@ public class TimingJudge : MonoBehaviour
             if (cursorX >= zoneX - halfWidth &&
                 cursorX <= zoneX + halfWidth)
             {
-                detectedZone = i;
+                currentZone = i;
                 break;
             }
         }
 
-        // ゾーンが変わったときだけ表示を更新
-        if (detectedZone != currentZone)
+        UpdateActionText();
+    }
+
+    // 現在の状態に合わせて文字を表示
+    private void UpdateActionText()
+    {
+        if (actionText == null)
         {
-            currentZone = detectedZone;
+            return;
+        }
 
-            switch (currentZone)
-            {
-                case 0:
-                    actionText.text = "攻撃ゾーン！";
-                    break;
-
-                case 1:
-                    actionText.text = "回避ゾーン！";
-                    break;
-
-                case 2:
-                    actionText.text = "回復ゾーン！";
-                    break;
-
-                case 3:
-                    actionText.text = "特殊技ゾーン！";
-                    break;
-
-                default:
-                    actionText.text = "タイミングを合わせよう！";
-                    break;
-            }
+        if (currentZone >= 0 &&
+            currentZone < actionNames.Length)
+        {
+            actionText.text = actionNames[currentZone];
+        }
+        else
+        {
+            actionText.text = "たいき";
         }
     }
 
-    // ゾーンごとの行動
-    void ExecuteAction(int zoneNumber)
+    // クリックした瞬間の判定
+    private void JudgeAction()
     {
-        switch (zoneNumber)
+        if (currentZone == -1)
         {
-            case 1:
+            actionText.text = "ドンマイｗ";
+            Debug.Log("ドンマイｗ");
+            return;
+        }
+
+        ExecuteAction(currentZone);
+    }
+
+    // ゾーンに対応した行動を実行
+    private void ExecuteAction(int zoneIndex)
+    {
+        switch (zoneIndex)
+        {
+            case 0:
                 Attack();
                 break;
 
-            case 2:
+            case 1:
                 Dodge();
                 break;
 
-            case 3:
+            case 2:
                 Heal();
                 break;
 
-            case 4:
+            case 3:
                 SpecialAttack();
                 break;
         }
     }
 
-    // ゾーン1：攻撃
-    void Attack()
+    private void Attack()
     {
-        Debug.Log("a");
-        actionText.text = "a";
+        Debug.Log("つうじおう");
+        actionText.text = "つうじおう";
     }
 
-    // ゾーン2：回避
-    void Dodge()
+    private void Dodge()
     {
-        Debug.Log("i");
-        actionText.text = "i";
+        Debug.Log("ふえいんと");
+        actionText.text = "ふえいんと";
     }
 
-    // ゾーン3：回復
-    void Heal()
+    private void Heal()
     {
-        Debug.Log("u");
-        actionText.text = "u";
+        Debug.Log("れんぞく");
+        actionText.text = "れんぞく";
     }
 
-    // ゾーン4：特殊技
-    void SpecialAttack()
+    private void SpecialAttack()
     {
-        Debug.Log("e");
-        actionText.text = "e";
+        Debug.Log("げきおも");
+        actionText.text = "げきおも";
     }
-
 }
 
