@@ -5,46 +5,150 @@ using Unity.VisualScripting.Antlr3.Runtime;
 
 public class TimingJudge : MonoBehaviour
 {
+    [Header("カーソル")]
     [SerializeField] private RectTransform cursor;
-    [SerializeField] private RectTransform successZone;
-    [SerializeField] private TMP_Text resultText;
+
+    [Header("4つの成功ゾーン")]
+    [SerializeField]
+    private RectTransform[] successZones =
+        new RectTransform[4];
+
+    [Header("画面に表示する文字")]
+    [SerializeField] private TMP_Text actionText;
+
+    // 現在カーソルが触れているゾーン
+    private int currentZone = -1;
+
+    void Start()
+    {
+        actionText.text = "タイミングを合わせよう！";
+    }
 
     void Update()
     {
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
+        // カーソルがゾーンに触れているか確認
+        CheckCursorZone();
+
+        // 左クリックで行動を実行
+        if (Mouse.current != null &&
+            Mouse.current.leftButton.wasPressedThisFrame)
         {
-            judge();
+            if (currentZone != -1)
+            {
+                ExecuteAction(currentZone + 1);
+            }
+            else
+            {
+                actionText.text = "失敗！";
+                Debug.Log("失敗！");
+            }
         }
     }
-    void judge()
+
+    // カーソルがどのゾーンに触れているか確認
+    void CheckCursorZone()
     {
         float cursorX = cursor.anchoredPosition.x;
-        float successX = successZone.anchoredPosition.x;
+        int detectedZone = -1;
 
-        float successWidth = successZone.rect.width / 2f;
-
-        if (cursorX >= successX - successWidth &&
-            cursorX <= successX + successWidth)
+        for (int i = 0; i < successZones.Length; i++)
         {
-            Success();
+            RectTransform zone = successZones[i];
+
+            if (zone == null)
+                continue;
+
+            float zoneX = zone.anchoredPosition.x;
+            float halfWidth = zone.rect.width / 2f;
+
+            if (cursorX >= zoneX - halfWidth &&
+                cursorX <= zoneX + halfWidth)
+            {
+                detectedZone = i;
+                break;
+            }
         }
-        else
+
+        // ゾーンが変わったときだけ表示を更新
+        if (detectedZone != currentZone)
         {
-            Failed();
+            currentZone = detectedZone;
+
+            switch (currentZone)
+            {
+                case 0:
+                    actionText.text = "攻撃ゾーン！";
+                    break;
+
+                case 1:
+                    actionText.text = "回避ゾーン！";
+                    break;
+
+                case 2:
+                    actionText.text = "回復ゾーン！";
+                    break;
+
+                case 3:
+                    actionText.text = "特殊技ゾーン！";
+                    break;
+
+                default:
+                    actionText.text = "タイミングを合わせよう！";
+                    break;
+            }
         }
     }
-    void Success() 
-    {
-         Debug.Log("成功");
 
-        resultText.text = "SUCCELSS";
-    }
-    void Failed() 
+    // ゾーンごとの行動
+    void ExecuteAction(int zoneNumber)
     {
-        Debug.Log("失敗");
+        switch (zoneNumber)
+        {
+            case 1:
+                Attack();
+                break;
 
-        resultText.text = "MISS";
+            case 2:
+                Dodge();
+                break;
+
+            case 3:
+                Heal();
+                break;
+
+            case 4:
+                SpecialAttack();
+                break;
+        }
     }
-    
+
+    // ゾーン1：攻撃
+    void Attack()
+    {
+        Debug.Log("a");
+        actionText.text = "a";
+    }
+
+    // ゾーン2：回避
+    void Dodge()
+    {
+        Debug.Log("i");
+        actionText.text = "i";
+    }
+
+    // ゾーン3：回復
+    void Heal()
+    {
+        Debug.Log("u");
+        actionText.text = "u";
+    }
+
+    // ゾーン4：特殊技
+    void SpecialAttack()
+    {
+        Debug.Log("e");
+        actionText.text = "e";
+    }
+
 }
 
