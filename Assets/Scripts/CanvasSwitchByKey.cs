@@ -5,7 +5,7 @@ public class CanvasSwitchByKey : MonoBehaviour
 {
     [Header("”ñ•\Ž¦‚É‚·‚éCanvas")]
     [SerializeField] private Canvas currentCanvas;
-
+        
     [Header("•\Ž¦‚·‚éCanvas")]
     [SerializeField] private Canvas targetCanvas;
 
@@ -33,11 +33,13 @@ public class CanvasSwitchByKey : MonoBehaviour
 
     private void Update()
     {
-        if (Gamepad.current != null &&
-            Gamepad.current.buttonEast.wasPressedThisFrame)
+       
+        if ((Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame) ||
+            (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame))
         {
             SwitchCanvas();
         }
+
     }
 
     private void SwitchCanvas()
@@ -68,8 +70,13 @@ public class CanvasSwitchByKey : MonoBehaviour
     {
         isMovingCamera = true;
 
+        
         Vector3 startPosition = targetCamera.transform.position;
+        Quaternion startRotation = targetCamera.transform.rotation;
+
+        
         Vector3 endPosition = cameraTarget.position;
+        Quaternion endRotation = cameraTarget.rotation;
 
         float elapsed = 0f;
 
@@ -79,17 +86,23 @@ public class CanvasSwitchByKey : MonoBehaviour
 
             float t = Mathf.Clamp01(elapsed / cameraMoveDuration);
 
-            // ‚È‚ß‚ç‚©‚ÉˆÚ“®
+            
             t = Mathf.SmoothStep(0f, 1f, t);
 
-            targetCamera.transform.position =
-                Vector3.Lerp(startPosition, endPosition, t);
+            
+            targetCamera.transform.position = Vector3.Lerp(startPosition, endPosition, t);
+
+           
+            targetCamera.transform.rotation = Quaternion.Slerp(startRotation, endRotation, t);
 
             yield return null;
         }
 
+        
         targetCamera.transform.position = endPosition;
+        targetCamera.transform.rotation = endRotation;
 
         isMovingCamera = false;
     }
+
 }

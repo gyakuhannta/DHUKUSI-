@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using System.Collections;
+using UnityEngine.SceneManagement;
 
 public class TwoChoiceSelector : MonoBehaviour
 {
@@ -21,6 +22,11 @@ public class TwoChoiceSelector : MonoBehaviour
     [SerializeField] private float blinkOnTime = 0.3f;
     [SerializeField]
     private int blinkCount = 3;
+    [Header("選択肢1の遷移先シーン名")]
+    [SerializeField] private string sceneForSelection1;
+
+    [Header("選択肢2の遷移先シーン名")]
+    [SerializeField] private string sceneForSelection2;
 
     private int currentSelection;
     private bool canMove = true;
@@ -35,40 +41,56 @@ public class TwoChoiceSelector : MonoBehaviour
 
     private void Update()
     {
-        if (Gamepad.current == null)
-            return;
+        // 点滅中は一切の入力を受け付けない
+        if (isBlinking) return;
 
-        float stickY = Gamepad.current.leftStick.ReadValue().y;
-        float dpadY = Gamepad.current.dpad.ReadValue().y;
+        // --- 1. 上下の移動入力を取得 ---
+        float moveY = 0f;
 
-        // 点滅中は選択変更しない
-        if (!isBlinking)
+        // ゲームパッドの入力
+        if (Gamepad.current != null)
         {
-            // 上
-            if (canMove && (stickY > 0.5f || dpadY > 0.5f))
-            {
-                MoveSelection(-1);
-                canMove = false;
-            }
+            float stickY = Gamepad.current.leftStick.ReadValue().y;
+            float dpadY = Gamepad.current.dpad.ReadValue().y;
+            if (Mathf.Abs(stickY) > 0.5f) moveY = stickY;
+            else if (Mathf.Abs(dpadY) > 0.5f) moveY = dpadY;
+        }
 
-            // 下
-            if (canMove && (stickY < -0.5f || dpadY < -0.5f))
-            {
-                MoveSelection(1);
-                canMove = false;
-            }
+        // キーボードの入力（矢印キーの上/下 または W/S）も追加
+        if (Keyboard.current != null && moveY == 0f)
+        {
+            if (Keyboard.current.upArrowKey.isPressed || Keyboard.current.wKey.isPressed) moveY = 1f;
+            if (Keyboard.current.downArrowKey.isPressed || Keyboard.current.sKey.isPressed) moveY = -1f;
+        }
 
-            // スティック・十字キーを離した
-            if (Mathf.Abs(stickY) < 0.2f && Mathf.Abs(dpadY) < 0.2f)
-            {
-                canMove = true;
-            }
+        // --- 2. 選択肢の移動処理 ---
+        if (canMove && moveY > 0.5f)
+        {
+            MoveSelection(-1); // 上
+            canMove = false;
+        }
+        else if (canMove && moveY < -0.5f)
+        {
+            MoveSelection(1); // 下
+            canMove = false;
+        }
 
-            // ○ボタン
-            if (Gamepad.current.buttonEast.wasPressedThisFrame)
-            {
-                StartCoroutine(BlinkSelectedImage());
-            }
+        // 入力が離されたら再度移動可能にする
+        if (Mathf.Abs(moveY) < 0.2f)
+        {
+            canMove = true;
+        }
+
+        // --- 3. 決定（○ボタン / マウス左クリック / Enterキー） ---
+        bool isSubmitPressed = false;
+
+        if (Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame) isSubmitPressed = true;
+        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame) isSubmitPressed = true; // マウス左クリック
+        if (Keyboard.current != null && Keyboard.current.enterKey.wasPressedThisFrame) isSubmitPressed = true; // Enterキー
+
+        if (isSubmitPressed)
+        {
+            StartCoroutine(BlinkSelectedImage());
         }
     }
 
@@ -100,15 +122,18 @@ public class TwoChoiceSelector : MonoBehaviour
         isBlinking = true;
 
         GameObject selectedImage = null;
+        string targetSceneName = ""; 
 
-        // 現在選択されている画像を取得
+        
         if (currentSelection == 0)
         {
             selectedImage = Selectimage1;
+            targetSceneName = sceneForSelection1;
         }
         else
         {
             selectedImage = Selectimage2;
+            targetSceneName = sceneForSelection2;
         }
 
         if (selectedImage == null)
@@ -129,9 +154,18 @@ public class TwoChoiceSelector : MonoBehaviour
             yield return new WaitForSeconds(blinkOnTime);
         }
 
-        // 最後は必ず表示
+       
         selectedImage.SetActive(true);
 
-        isBlinking = false;
+        
+        if (!string.IsNullOrEmpty(targetSceneName))
+        {
+            SceneManager.LoadScene(targetSceneName);
+        }
+        else
+        {
+            Debug.LogWarning("遷移先のシーン名が設定されていません。");
+            isBlinking = false; 
+        }
     }
 }
