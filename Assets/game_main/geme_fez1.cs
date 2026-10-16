@@ -1,8 +1,9 @@
 using UnityEngine;
 
-public class geme_cost : MonoBehaviour
+public class geme_fez1 : MonoBehaviour
 {
 
+    public bool dad=false;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {

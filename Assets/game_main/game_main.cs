@@ -1,13 +1,19 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class NewMonoBehaviourScript : MonoBehaviour
+public class game_main : MonoBehaviour
 {
-    public bool fez1 = false;
-    public bool fez2 = false;
-     public bool fez3 = false;
+    public geme_fez1 mod1;
+    [SerializeField]
+    private GameObject fez1panel;
+    //フェーズ移行用
+     bool fez1 = false;
+     bool fez2 = false;
+     bool fez3 = false;
      bool fez4 = false;
-
+    //タイマー関連
+    [SerializeField]
+    private float timelmit=30;
     private float taima =0;
 
 
@@ -29,10 +35,15 @@ public class NewMonoBehaviourScript : MonoBehaviour
 
         taima += Time.deltaTime;
 
-        
+      
 
+        //メインゲームループ
+         //攻守決めフェーズ初回のみ
         if (fez1==true) {
-            if (taima >= 3)
+            
+            fez1panel.SetActive(true);
+
+            if (taima >= timelmit)
             {
                 fez1 = false;
                 fez2 = true;
@@ -42,6 +53,8 @@ public class NewMonoBehaviourScript : MonoBehaviour
         }
         if (fez2==true )
         {
+            fez1panel.SetActive(false);
+
             if (taima >= 5)
             {
                 fez2 = false;
