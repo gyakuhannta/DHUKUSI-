@@ -597,7 +597,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: -290, y: 0}
   m_SizeDelta: {x: 10, y: 80}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &826870644
@@ -650,7 +650,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 49616427c09aa4244832345d276263b0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TimingCursor
-  speed: 300
+  speed: 200
   LeftLimit: -290
   rightLimit: 290
 --- !u!1 &977809252
