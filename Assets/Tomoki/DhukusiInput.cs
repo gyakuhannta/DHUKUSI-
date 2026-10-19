@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -10,16 +10,16 @@ public class DhukusiInput : MonoBehaviour
     //デュクシの種類
     public enum DhukusiType
     {
-        Normal,   // 通常デュクシ
-        Feint,    // フェイントデュクシ
-        Renzoku,  // 連続デュクシ
-        Gekiomo   // 激重デュクシ
+        Normal,   // 通常デュクシ（青）
+        Feint,    // フェイントデュクシ（緑）
+        Renzoku,  // 連続デュクシ（黄）
+        Gekiomo   // 激重デュクシ（赤）
     }
 
     /// <summary>今どの入力を受け付けるか</summary>
     public enum InputPhase
     {
-        None,    // 何も受け付けない
+        None,    // 何も受け付けない（演出中・判定表示中など）
         Select,  // デュクシ選択フェーズ
         Timing   // デュクシ繰り出しフェーズ
     }
@@ -58,7 +58,7 @@ public class DhukusiInput : MonoBehaviour
         }
     }
 
-    // 最後にボタンを押したプレイヤー（0 = 1P, 1 = 2P）
+    // 【追加】最後にボタンを押したプレイヤー（0 = 1P, 1 = 2P）
     public int LastPlayer { get; private set; } = 0;
 
     //デュクシが選ばれた
@@ -75,14 +75,17 @@ public class DhukusiInput : MonoBehaviour
 
     //長押しの状態
     private PadButton? heldButton = null;   // 今押しているボタン（押してなければ null）
-    private int heldPlayer = -1;            // そのボタンを押しているプレイヤー
+    private int heldPlayer = -1;            // 【追加】そのボタンを押しているプレイヤー
     private float holdStartTime;            // 押し始めた時刻
     private bool cancelFired;               // この長押しでもうキャンセルしたか
 
     //今のボタンを何秒押しているか（押してなければ 0）
     public float HoldTime => heldButton.HasValue ? Time.time - holdStartTime : 0f;
 
-    //キャンセルまでの進み具合 0〜1
+    //今押しているデュクシの番号（0=通常 1=フェイント 2=連続 3=激重、押してなければ -1）UI用
+    public int HeldDhukusi => heldButton.HasValue ? (int)ToDhukusi(heldButton.Value) : -1;
+
+    //キャンセルまでの進み具合 0〜1（長押しゲージ用）
     public float CancelProgress => Mathf.Clamp01(HoldTime / cancelHoldSeconds);
 
     void Awake()
@@ -95,14 +98,14 @@ public class DhukusiInput : MonoBehaviour
         Instance = this;
     }
 
-    // 起動時に、つながっているコントローラーを表示
+    // 【追加】起動時に、つながっているコントローラーを表示
     void Start()
     {
         LogGamepads();
     }
 
-    // コントローラーを抜き挿ししたら表示
-    void OnEnable() { InputSystem.onDeviceChange += OnDeviceChange; }
+    // 【追加】コントローラーを抜き挿ししたら表示
+    void OnEnable()  { InputSystem.onDeviceChange += OnDeviceChange; }
     void OnDisable() { InputSystem.onDeviceChange -= OnDeviceChange; }
 
     private void OnDeviceChange(InputDevice device, InputDeviceChange change)
@@ -137,7 +140,7 @@ public class DhukusiInput : MonoBehaviour
 
         var all = Gamepad.all;
 
-        // コントローラーが1台だけのときは、その1台で今のプレイヤーを操作する（テスト用）
+        // 【追加】コントローラーが1台だけのときは、その1台で今のプレイヤーを操作する（テスト用）
         if (all.Count == 1 && activePlayer >= 0)
         {
             CheckPad(all[0], activePlayer);
@@ -153,7 +156,7 @@ public class DhukusiInput : MonoBehaviour
             }
         }
 
-        //長押しが一定秒数を超えたらキャンセル
+        //長押しが一定秒数を超えたらキャンセル（選択フェーズだけ）
         if (phase == InputPhase.Select && heldButton.HasValue && !cancelFired
             && HoldTime >= cancelHoldSeconds)
         {
@@ -172,7 +175,7 @@ public class DhukusiInput : MonoBehaviour
         CheckButton(pad.buttonSouth, PadButton.South, player);
     }
 
-    //1つのボタンの押した,離したを調べる
+    //1つのボタンの「押した」「離した」を調べる
     private void CheckButton(UnityEngine.InputSystem.Controls.ButtonControl control, PadButton button, int player)
     {
         // 押した瞬間
@@ -184,7 +187,7 @@ public class DhukusiInput : MonoBehaviour
             cancelFired = false;
             LastPlayer = player;
 
-            // 繰り出しフェーズは押した瞬間で決定
+            // 繰り出しフェーズは「押した瞬間」で決定
             if (phase == InputPhase.Timing && button == PadButton.East)
             {
                 Debug.Log($"[入力] {player + 1}P タイミング押下 ({Time.time:F2}秒)");
@@ -192,14 +195,14 @@ public class DhukusiInput : MonoBehaviour
             }
         }
 
-        // 離した瞬間
+        // 離した瞬間（押したのと同じプレイヤーの同じボタンだけ）
         if (control.wasReleasedThisFrame && heldButton == button && heldPlayer == player)
         {
             float held = Time.time - holdStartTime;
             Debug.Log($"[入力] {player + 1}P {button} を離した（{held:F2}秒 押していた）");
             OnReleased?.Invoke(button, held);
 
-            // キャンセルしてなければ離したときに選択決定
+            // 選択フェーズ：キャンセルしてなければ「離したとき」に選択決定
             if (phase == InputPhase.Select && !cancelFired)
             {
                 Select(ToDhukusi(button));
