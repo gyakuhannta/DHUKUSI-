@@ -46,7 +46,7 @@ public class Press_Ablinking : MonoBehaviour
             // 指定透明度 → 0
             yield return FadeAlpha(maxAlpha, 0f, fadeOutDuration);
 
-            // 次のループへ
+           
         }
     }
 
