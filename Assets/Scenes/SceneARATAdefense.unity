@@ -493,11 +493,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 826870643}
   - {fileID: 1028181219}
   - {fileID: 1175679039}
   - {fileID: 1513301151}
   - {fileID: 977809253}
+  - {fileID: 826870643}
   m_Father: {fileID: 1777066488}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
@@ -935,10 +935,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: zo-nnihuretekudasai
+  m_text: "\u30DD\u30E1\u30E9\u30CB\u30A2\u30F3"
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 97ac80127217abf47ab83a55971323df, type: 2}
+  m_sharedMaterial: {fileID: -514462789346107517, guid: 97ac80127217abf47ab83a55971323df, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
