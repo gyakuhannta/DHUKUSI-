@@ -350,11 +350,23 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 367444945524134932, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 1129857441296723117, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1769956855153417664, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2470055874199214599, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
       propertyPath: m_IsActive
       value: 1
       objectReference: {fileID: 0}
-    - target: {fileID: 2470055874199214599, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
+    - target: {fileID: 4350058355211172417, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
@@ -366,9 +378,13 @@ PrefabInstance:
       propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
-    - target: {fileID: 7847356370360221620, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
+    - target: {fileID: 6664496405854026752, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
       propertyPath: m_IsActive
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7847356370360221620, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 7971791554211480260, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
       propertyPath: m_Pivot.x
@@ -448,6 +464,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 7971791554211480260, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8938228416860195248, guid: 2cc73026b02fc6d45baa2a838f7ed306, type: 3}
+      propertyPath: m_IsActive
       value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
