@@ -28,13 +28,11 @@ public class TimingCursor : MonoBehaviour
 
         if (position.x >= rightLimit)
         {
-            position.x = rightLimit;
-            direction = -1f;
+            return;
         }
         else if (position.x <= LeftLimit)
         {
-            position.x = LeftLimit;
-            direction = 1f;
+            return;
         }
 
         rectTransform.anchoredPosition = position;
