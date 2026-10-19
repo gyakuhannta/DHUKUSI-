@@ -877,7 +877,6 @@ GameObject:
   - component: {fileID: 1364427613}
   - component: {fileID: 1364427612}
   - component: {fileID: 1364427611}
-  - component: {fileID: 1364427615}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -978,24 +977,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1364427615
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1364427609}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bd50160741949448aa9ebdbc69f9dda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::playr1
-  cost: 30
-  ripacost: 10
-  cost_no: 1
-  cost_fe: 3
-  cost_co: 5
-  cost_he: 7
 --- !u!1 &1598362453
 GameObject:
   m_ObjectHideFlags: 0
@@ -1180,7 +1161,6 @@ GameObject:
   - component: {fileID: 1777139521}
   - component: {fileID: 1777139520}
   - component: {fileID: 1777139519}
-  - component: {fileID: 1777139524}
   m_Layer: 0
   m_Name: game_main
   m_TagString: Untagged
@@ -1296,24 +1276,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1777139524
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1777139518}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0a68c18f710edb54fb6d1b9eb4303616, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::geme_playerbase
-  cost: 30
-  ripacost: 10
-  cost_no: 1
-  cost_fe: 3
-  cost_co: 5
-  cost_he: 7
 --- !u!1 &1886717667
 GameObject:
   m_ObjectHideFlags: 0
