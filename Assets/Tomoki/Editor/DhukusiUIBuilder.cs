@@ -23,14 +23,14 @@ public static class DhukusiUIBuilder
 {
     // ---- 色（企画書・仕様書から） ----
     static readonly Color Yamabuki = Hex("#f8b500");   // キーカラー 山吹色
-    static readonly Color Wood = Hex("#fdcf9f");   // 木の板
+    static readonly Color Wood     = Hex("#fdcf9f");   // 木の板
     static readonly Color WoodDark = Hex("#a87a4a");   // 砕けた木の板（仮）
-    static readonly Color Blue = Hex("#1f6fd1");   // 通常
-    static readonly Color Green = Hex("#2fa84f");   // フェイント
-    static readonly Color Yellow = Hex("#f2d21b");   // 連続
-    static readonly Color Red = Hex("#e53935");   // 激重
-    static readonly Color Panel = new Color(1f, 1f, 1f, 0.85f);
-    static readonly Color Gray = new Color(0.8f, 0.8f, 0.8f, 1f);
+    static readonly Color Blue     = Hex("#1f6fd1");   // 通常
+    static readonly Color Green    = Hex("#2fa84f");   // フェイント
+    static readonly Color Yellow   = Hex("#f2d21b");   // 連続
+    static readonly Color Red      = Hex("#e53935");   // 激重
+    static readonly Color Panel    = new Color(1f, 1f, 1f, 0.85f);
+    static readonly Color Gray     = new Color(0.8f, 0.8f, 0.8f, 1f);
 
     static Font font;
 
@@ -41,7 +41,9 @@ public static class DhukusiUIBuilder
             !EditorUtility.DisplayDialog("DHUKUSI", "DHUKUSI_Canvas がもうあります。もう1つ作りますか？", "作る", "やめる"))
             return;
 
-        font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
+        // チームのフォント（でらすこゴシック）があればそれを使う。なければ Unity 標準
+        font = AssetDatabase.LoadAssetAtPath<Font>(DhukusiAssetImporter.FontPath)
+               ?? Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
         // ===== Canvas =====
         var canvasGO = new GameObject("DHUKUSI_Canvas", typeof(Canvas), typeof(CanvasScaler), typeof(GraphicRaycaster));
@@ -58,13 +60,13 @@ public static class DhukusiUIBuilder
         // ===== フェーズごとのパネル =====
         var pKoushuSelect = BuildKoushuSelect(root, out var choose, out var crush, out var cost);
         var pKoushuBattle = BuildKoushuBattle(root);
-        var pSelectAtk = BuildDhukusiSelect(root, "Panel_DhukusiSelect_Attack", "デュクシを選べ！（長押しでキャンセル）", out var atkImgs, out var atkGauge);
-        var pSelectDef = BuildDhukusiSelect(root, "Panel_DhukusiSelect_Defense", "相手のデュクシを予想しろ！（長押しでキャンセル）", out var defImgs, out var defGauge);
-        var pKuriAtk = BuildKuridashi(root, "Panel_Kuridashi_Attack", "好きなタイミングでデュクシ！");
-        var pKuriDef = BuildKuridashi(root, "Panel_Kuridashi_Defense", "予備動作を見て防御しろ！");
-        var pResult = BuildResult(root);
-        var pTitle = BuildTitle(root);
-        var pModeSelect = BuildModeSelect(root);
+        var pSelectAtk    = BuildDhukusiSelect(root, "Panel_DhukusiSelect_Attack",  "デュクシを選べ！（長押しでキャンセル）", out var atkImgs, out var atkGauge);
+        var pSelectDef    = BuildDhukusiSelect(root, "Panel_DhukusiSelect_Defense", "相手のデュクシを予想しろ！（長押しでキャンセル）", out var defImgs, out var defGauge);
+        var pKuriAtk      = BuildKuridashi(root, "Panel_Kuridashi_Attack",  "好きなタイミングでデュクシ！");
+        var pKuriDef      = BuildKuridashi(root, "Panel_Kuridashi_Defense", "予備動作を見て防御しろ！");
+        var pResult       = BuildResult(root);
+        var pTitle        = BuildTitle(root);
+        var pModeSelect   = BuildModeSelect(root);
 
         // ===== PhaseUIManager に登録 =====
         var manager = canvasGO.AddComponent<PhaseUIManager>();
@@ -115,7 +117,7 @@ public static class DhukusiUIBuilder
         for (int p = 0; p < 2; p++)
         {
             float side = p == 0 ? 0f : 1f;
-            float dir = p == 0 ? 1f : -1f;
+            float dir  = p == 0 ? 1f : -1f;
             var anchor = new Vector2(side, 1f);
 
             var box = Img($"Life_{p + 1}P", hud, anchor, new Vector2(dir * 250, -80), new Vector2(400, 110), Yamabuki);
@@ -133,7 +135,7 @@ public static class DhukusiUIBuilder
         Txt("Cost_Text", costBox.transform, new Vector2(0.5f, 0.5f), new Vector2(0, -15), new Vector2(340, 80), "10/10", 60, Color.black);
 
         // 経過時間
-        var timeBox = Img("Timer", hud, new Vector2(1f, 1f), new Vector2(-340, -205), new Vector2(260, 50), Gray);
+        var timeBox = Img("Timer", hud, new Vector2(1f, 1f), new Vector2(-250, -265), new Vector2(260, 50), Gray);
         Txt("Timer_Text", timeBox.transform, new Vector2(0.5f, 0.5f), Vector2.zero, new Vector2(260, 50), "経過時間 00:00", 26, Color.black);
         return hudGO;
     }
@@ -183,10 +185,10 @@ public static class DhukusiUIBuilder
         var three = Img("Three_choice", t, new Vector2(0.5f, 1f), new Vector2(0, -370), new Vector2(700, 70), Yamabuki);
         Txt("Three_choice_Text", three.transform, Center, Vector2.zero, new Vector2(700, 70), "3つの中から一つ選ぼう", 40, Color.black);
 
-        string[] names = { "One", "Two", "Three" };
+        string[] names  = { "One", "Two", "Three" };
         string[] labels = { "疾風デュクシ", "剛腕デュクシ", "鉄壁デュクシ" };
-        string[] costs = { "コスト3", "コスト5", "コスト4" };
-        Vector2[] pos = { new Vector2(0, 20), new Vector2(-400, -260), new Vector2(400, -260) };
+        string[] costs  = { "コスト3", "コスト5", "コスト4" };
+        Vector2[] pos   = { new Vector2(0, 20), new Vector2(-400, -260), new Vector2(400, -260) };
 
         choose = new GameObject[3]; crush = new GameObject[3]; cost = new GameObject[3];
         for (int i = 0; i < 3; i++)
@@ -232,10 +234,10 @@ public static class DhukusiUIBuilder
         Txt("Guide_Text", t, new Vector2(0.5f, 0f), new Vector2(0, 280), new Vector2(1400, 70), guide, 44, Color.black);
 
         var bar = Img("Select_Bar", t, new Vector2(0.5f, 0f), new Vector2(0, 120), new Vector2(1560, 170), Panel);
-        string[] names = { "Normal", "Feint", "Renzoku", "Gekiomo" };   // DhukusiType と同じ順番
+        string[] names  = { "Normal", "Feint", "Renzoku", "Gekiomo" };   // DhukusiType と同じ順番
         string[] labels = { "通常デュクシ\nコスト1", "フェイントデュクシ\nコスト5", "連続デュクシ\nコスト3", "激重デュクシ\nコスト7" };
-        Color[] colors = { Blue, Green, Yellow, Red };
-        string[] btn = { "上", "左", "右", "下" };
+        Color[] colors  = { Blue, Green, Yellow, Red };
+        string[] btn    = { "上", "左", "右", "下" };
 
         imgs = new Image[4];
         for (int i = 0; i < 4; i++)
@@ -268,8 +270,8 @@ public static class DhukusiUIBuilder
         // 発生タイミングバー（企画書の並び：通常 → フェイント → 連続 → 激重）
         var bg = Img("TimingBar", t, new Vector2(0.5f, 0f), new Vector2(0, 120), new Vector2(1500, 110), Panel);
         string[] labels = { "つうじょう", "フェイント", "れんぞく", "げきおも" };
-        Color[] colors = { Blue, Green, Yellow, Red };
-        float[] widths = { 280, 280, 420, 420 };   // 仮：0〜1秒 / 1〜2秒 / 2〜3.5秒 / 3.5〜5秒
+        Color[] colors  = { Blue, Green, Yellow, Red };
+        float[] widths  = { 280, 280, 420, 420 };   // 仮：0〜1秒 / 1〜2秒 / 2〜3.5秒 / 3.5〜5秒
         float x = -700;
         for (int i = 0; i < 4; i++)
         {
@@ -301,15 +303,15 @@ public static class DhukusiUIBuilder
     }
 
     // ===================== プレビュー =====================
-    [MenuItem("DHUKUSI/プレビュー/タイトル")] static void P8() => Preview(PhaseUIManager.UIPhase.Title);
-    [MenuItem("DHUKUSI/プレビュー/モード選択")] static void P9() => Preview(PhaseUIManager.UIPhase.ModeSelect);
-    [MenuItem("DHUKUSI/プレビュー/攻守決め 選択")] static void P1() => Preview(PhaseUIManager.UIPhase.KoushuSelect);
-    [MenuItem("DHUKUSI/プレビュー/攻守決め 勝負")] static void P2() => Preview(PhaseUIManager.UIPhase.KoushuBattle);
+    [MenuItem("DHUKUSI/プレビュー/タイトル")]           static void P8() => Preview(PhaseUIManager.UIPhase.Title);
+    [MenuItem("DHUKUSI/プレビュー/モード選択")]         static void P9() => Preview(PhaseUIManager.UIPhase.ModeSelect);
+    [MenuItem("DHUKUSI/プレビュー/攻守決め 選択")]      static void P1() => Preview(PhaseUIManager.UIPhase.KoushuSelect);
+    [MenuItem("DHUKUSI/プレビュー/攻守決め 勝負")]      static void P2() => Preview(PhaseUIManager.UIPhase.KoushuBattle);
     [MenuItem("DHUKUSI/プレビュー/デュクシ選択 攻撃側")] static void P3() => Preview(PhaseUIManager.UIPhase.DhukusiSelectAttack);
     [MenuItem("DHUKUSI/プレビュー/デュクシ選択 防御側")] static void P4() => Preview(PhaseUIManager.UIPhase.DhukusiSelectDefense);
-    [MenuItem("DHUKUSI/プレビュー/繰り出し 攻撃側")] static void P5() => Preview(PhaseUIManager.UIPhase.KuridashiAttack);
-    [MenuItem("DHUKUSI/プレビュー/繰り出し 防御側")] static void P6() => Preview(PhaseUIManager.UIPhase.KuridashiDefense);
-    [MenuItem("DHUKUSI/プレビュー/勝敗判定")] static void P7() => Preview(PhaseUIManager.UIPhase.Result);
+    [MenuItem("DHUKUSI/プレビュー/繰り出し 攻撃側")]     static void P5() => Preview(PhaseUIManager.UIPhase.KuridashiAttack);
+    [MenuItem("DHUKUSI/プレビュー/繰り出し 防御側")]     static void P6() => Preview(PhaseUIManager.UIPhase.KuridashiDefense);
+    [MenuItem("DHUKUSI/プレビュー/勝敗判定")]           static void P7() => Preview(PhaseUIManager.UIPhase.Result);
 
     static void Preview(PhaseUIManager.UIPhase phase)
     {
