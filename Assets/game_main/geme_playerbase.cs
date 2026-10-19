@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 public class geme_playerbase : MonoBehaviour
@@ -5,7 +6,15 @@ public class geme_playerbase : MonoBehaviour
 
 
     [SerializeField]
-    public int maxcost=30;//最大コスト
+    public const int maxcost=30;//最大コスト
+    [SerializeField] 
+    public const int mincost=0;//最小コスト
+    public int cost=30;//現在コスト
+
+    
+
+
+
     [SerializeField]
     public int ripacost=10;//回復コスト
 
@@ -16,28 +25,36 @@ public class geme_playerbase : MonoBehaviour
 
     
 
+    public void costbese()//コストのシステム試作
+    {
+        cost = Mathf.Clamp(cost, maxcost, mincost);
+
+    }
 
     
     public void nomal() //通常デュクシ
     {
-        maxcost-=cost_no;
+        cost-=cost_no;
 
     }
     public void feint() //フェイント
     {
-        maxcost -= cost_fe;
+        cost -= cost_fe;
     }
     public void combo() //連続
     {
-        maxcost -= cost_co;
+        cost -= cost_co;
     }
     public void heavy() //激重
     {
-        maxcost -= cost_he;
+        cost -= cost_he;
     }
-    public void recovery()
+    public void recovery()//コストゼロになった時の処理
     {
-        maxcost += ripacost;
+        if (cost <= 0)
+        {
+            cost += ripacost;
+        }
     }
 
     

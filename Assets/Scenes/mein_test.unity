@@ -877,7 +877,7 @@ GameObject:
   - component: {fileID: 1364427613}
   - component: {fileID: 1364427612}
   - component: {fileID: 1364427611}
-  - component: {fileID: 1364427610}
+  - component: {fileID: 1364427615}
   m_Layer: 0
   m_Name: Cube
   m_TagString: Untagged
@@ -885,24 +885,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1364427610
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1364427609}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4bd50160741949448aa9ebdbc69f9dda, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::playr1
-  maxcost: 30
-  ripacost: 10
-  cost_no: 1
-  cost_fe: 3
-  cost_co: 5
-  cost_he: 7
 --- !u!65 &1364427611
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -996,6 +978,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1364427615
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1364427609}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bd50160741949448aa9ebdbc69f9dda, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::playr1
+  cost: 30
+  ripacost: 10
+  cost_no: 1
+  cost_fe: 3
+  cost_co: 5
+  cost_he: 7
 --- !u!1 &1598362453
 GameObject:
   m_ObjectHideFlags: 0
@@ -1308,7 +1308,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0a68c18f710edb54fb6d1b9eb4303616, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::geme_playerbase
-  maxcost: 30
+  cost: 30
   ripacost: 10
   cost_no: 1
   cost_fe: 3
