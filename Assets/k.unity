@@ -151,7 +151,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DhukusiInput
   phase: 1
   cancelHoldSeconds: 1
-  gamepadIndex: -1
+  activePlayer: -1
 --- !u!4 &360123231
 Transform:
   m_ObjectHideFlags: 0
