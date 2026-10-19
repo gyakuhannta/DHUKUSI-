@@ -11,11 +11,16 @@ public class TimingCursor : MonoBehaviour
 
     private RectTransform rectTransform;
 
-    void Start()
+    private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
     }
     void Update()
+    {
+        MoveCursor();
+    }
+
+    private void MoveCursor()
     {
         Vector2 position = rectTransform.anchoredPosition;
 
@@ -23,14 +28,13 @@ public class TimingCursor : MonoBehaviour
 
         if (position.x >= rightLimit)
         {
-            position.x = rightLimit;
-            direction = -1f;
+            return;
         }
-        if (position.x <= LeftLimit)
+        else if (position.x <= LeftLimit)
         {
-            position.x = LeftLimit;
-            direction = 1f;
+            return;
         }
+
         rectTransform.anchoredPosition = position;
     }
 }
