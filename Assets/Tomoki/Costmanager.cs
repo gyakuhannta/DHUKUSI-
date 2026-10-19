@@ -10,9 +10,9 @@ public class CostManager : MonoBehaviour
 
     [Header("各デュクシのコスト（仮の値）")]
     [SerializeField] private int normalCost = 1;   // 通常デュクシ
-    [SerializeField] private int feintCost = 2;    // フェイントデュクシ
-    [SerializeField] private int renzokuCost = 3;  // 連続デュクシ
-    [SerializeField] private int gekiomoCost = 4;  // 激重デュクシ
+    [SerializeField] private int feintCost = 3;    // フェイントデュクシ
+    [SerializeField] private int renzokuCost = 5;  // 連続デュクシ
+    [SerializeField] private int gekiomoCost = 7;  // 激重デュクシ
 
     [Header("状態（確認用）")]
     [Tooltip("今の攻撃側 0 = 1P, 1 = 2P")]
