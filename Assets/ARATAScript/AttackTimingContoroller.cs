@@ -17,60 +17,65 @@ public class AttackTimingContoroller : MonoBehaviour
     private string currentTechnique = "";
     private void Start()
     {
-        // ゲーム開始時はバーを隠す
+        // 最初はタイミングバーを非表示
         timingBar.SetActive(false);
-        resultText.text = "技を選んでください";
+        Debug.Log("AttackTimingController 起動");
     }
     private void Update()
     {
+        // 攻撃中でなければ何もしない
         if (!isAttacking)
         {
             return;
         }
-        // カーソルを左右に動かす
+        // カーソルを移動させる
         Vector2 position = cursor.anchoredPosition;
         position.x += speed * direction * Time.deltaTime;
+        // 右端に到達したら左へ
         if (position.x >= rightLimit)
         {
             position.x = rightLimit;
             direction = -1f;
         }
+        // 左端に到達したら右へ
         else if (position.x <= leftLimit)
         {
             position.x = leftLimit;
             direction = 1f;
         }
         cursor.anchoredPosition = position;
-        // マウスの左クリックでタイミングを決める
+        // 左クリックされたら判定
         if (Mouse.current != null &&
             Mouse.current.leftButton.wasPressedThisFrame)
         {
             JudgeAttack();
         }
     }
-    // 技を選んだときに呼び出す
+    // 攻撃開始
     public void StartAttackTiming(string techniqueName)
     {
         if (isAttacking)
         {
             return;
         }
+        Debug.Log("攻撃開始：" + techniqueName);
         currentTechnique = techniqueName;
         direction = 1f;
+        // カーソルを左端に戻す
         Vector2 position = cursor.anchoredPosition;
         position.x = leftLimit;
         cursor.anchoredPosition = position;
+        // タイミングバーを表示
         timingBar.SetActive(true);
-        resultText.text = currentTechnique + "：タイミングを決めてください";
+        // 攻撃状態にする
         isAttacking = true;
+        resultText.text = currentTechnique + "：タイミングを決めてください";
     }
-    // クリックした位置から攻撃タイミングを判定する
+    // 攻撃判定
     private void JudgeAttack()
     {
         isAttacking = false;
-        timingBar.SetActive(false);
         float x = cursor.anchoredPosition.x;
-        // 中央付近を成功範囲にする
         if (x >= -40f && x <= 40f)
         {
             resultText.text = currentTechnique + "：攻撃成功！";
@@ -79,5 +84,7 @@ public class AttackTimingContoroller : MonoBehaviour
         {
             resultText.text = currentTechnique + "：攻撃失敗...";
         }
+        timingBar.SetActive(false);
+        Debug.Log("攻撃判定終了");
     }
 }
