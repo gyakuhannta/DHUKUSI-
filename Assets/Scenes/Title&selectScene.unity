@@ -1041,14 +1041,12 @@ MonoBehaviour:
   blinkOffTime: 0.3
   blinkOnTime: 0.3
   blinkCount: 3
-  sceneForSelection1: 
+  sceneForSelection1: SEBGMadjustment
   sceneForSelection2: 
   minHoldDuration: 0.3
   cancelHoldDuration: 3
   holdProgressImage: {fileID: 0}
-  fadeImage: {fileID: 344745576}
-  fadeDuration: 3
-  fadeInDuration: 4
+  sceneFader: {fileID: 2001467175}
 --- !u!4 &1456111474
 Transform:
   m_ObjectHideFlags: 0
@@ -1322,6 +1320,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2001467174}
   - component: {fileID: 2001467173}
+  - component: {fileID: 2001467175}
   m_Layer: 0
   m_Name: GameObject
   m_TagString: Untagged
@@ -1365,6 +1364,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2001467175
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2001467172}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 480ffadb01568e04a993dd8638e5d4c7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SceneFader
+  fadeImage: {fileID: 344745576}
+  fadeInDuration: 1
+  fadeDuration: 1
 --- !u!1 &2147358512
 GameObject:
   m_ObjectHideFlags: 0
