@@ -1044,6 +1044,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8327847636516214013}
+  - component: {fileID: 3059987142838518936}
   m_Layer: 0
   m_Name: Panel_Title
   m_TagString: Untagged
@@ -1072,6 +1073,26 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &3059987142838518936
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1129857441296723117}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 092e7cdd6603c66479a6ac85f75d5785, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TitleUI
+  pressA: {fileID: 9221807257693501998}
+  minAlpha: 0
+  maxAlpha: 40
+  fadeInSeconds: 1.5
+  fadeOutSeconds: 1.5
+  keepSeconds: 2
+  aButton: 0
+  goToModeSelect: 1
 --- !u!1 &1148543992392323248
 GameObject:
   m_ObjectHideFlags: 0
@@ -7320,6 +7341,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7256402084692902764}
+  - component: {fileID: 819588824463700198}
   m_Layer: 0
   m_Name: Panel_ModeSelect
   m_TagString: Untagged
@@ -7350,6 +7372,30 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
+--- !u!114 &819588824463700198
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6546666204202884687}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fcd90c902ab762041ad98d3aacfd9d07, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ModeSelectUI
+  options:
+  - {fileID: 8404923450683097765}
+  - {fileID: 3977603393185440261}
+  fingers:
+  - {fileID: 9065478359088691070}
+  - {fileID: 8842334354695966424}
+  stickThreshold: 0.5
+  aButton: 0
+  hideSeconds: 0.3
+  showSeconds: 0.3
+  blinkCount: 3
+  goToMain: 1
 --- !u!1 &6664496405854026752
 GameObject:
   m_ObjectHideFlags: 0
