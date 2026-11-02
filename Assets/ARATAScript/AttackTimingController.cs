@@ -7,6 +7,7 @@ public class AttackTimingController : MonoBehaviour
     [SerializeField] private GameObject timingBar;
     [SerializeField] private RectTransform cursor;
     [SerializeField] private TMP_Text resultText;
+    [SerializeField] private EnemyController enemy;
 
     [Header("カーソルの設定")]
     [SerializeField] private float speed = 300f;
@@ -81,18 +82,31 @@ public class AttackTimingController : MonoBehaviour
     private void JudgeAttack()
     {
         isAttacking = false;
-        timingBar.SetActive(false);
 
         float x = cursor.anchoredPosition.x;
 
-        // 中央付近を成功範囲にする
+        // 中央付近なら攻撃成功
         if (x >= -40f && x <= 40f)
         {
             resultText.text = currentTechnique + "：攻撃成功！";
+
+            Debug.Log("敵にダメージを与えました");
+
+            // 敵にダメージを与える
+            enemy.TakeDamage();
         }
         else
         {
             resultText.text = currentTechnique + "：攻撃失敗...";
         }
+
+        // 2秒後にバーを消す
+        Invoke(nameof(HideTimingBar), 2f);
+    }
+
+    // タイミングバーを消す
+    private void HideTimingBar()
+    {
+        timingBar.SetActive(false);
     }
 }
