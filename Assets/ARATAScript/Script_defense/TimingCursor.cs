@@ -3,19 +3,18 @@ using UnityEngine;
 public class TimingCursor : MonoBehaviour
 {
     [SerializeField] private float speed = 300f;
-
-    [SerializeField] private float LeftLimit = -290f;
+    [SerializeField] private float leftLimit = -290f;
     [SerializeField] private float rightLimit = 290f;
 
     private float direction = 1f;
-
     private RectTransform rectTransform;
 
     private void Awake()
     {
         rectTransform = GetComponent<RectTransform>();
     }
-    void Update()
+
+    private void Update()
     {
         MoveCursor();
     }
@@ -28,11 +27,13 @@ public class TimingCursor : MonoBehaviour
 
         if (position.x >= rightLimit)
         {
-            return;
+            position.x = rightLimit;
+            direction = -1f;
         }
-        else if (position.x <= LeftLimit)
+        else if (position.x <= leftLimit)
         {
-            return;
+            position.x = leftLimit;
+            direction = 1f;
         }
 
         rectTransform.anchoredPosition = position;

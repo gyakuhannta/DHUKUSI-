@@ -102,8 +102,16 @@ public class AttackTimingController : MonoBehaviour
 
         // 2秒後にバーを消す
         Invoke(nameof(HideTimingBar), 2f);
+
+        // 攻撃判定が終わったら防御を開始
+        Invoke(nameof(StartEnemyDefense), 2f);
     }
 
+
+    private void StartEnemyDefense()
+    {
+        FindFirstObjectByType<TimingJudge>().StartDefense();
+    }
     // タイミングバーを消す
     private void HideTimingBar()
     {
