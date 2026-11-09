@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -63,6 +63,20 @@ public class KoushuSelectUI : MonoBehaviour
     {
         if (decided) return;
 
+        // ---- キーボード（コントローラーがないときのテスト用）↑ ← → で選択、Enter / Space で決定 ----
+        var kb = Keyboard.current;
+        if (kb != null)
+        {
+            if (kb.upArrowKey.wasPressedThisFrame || kb.wKey.wasPressedThisFrame) Select(0);
+            if (kb.leftArrowKey.wasPressedThisFrame || kb.aKey.wasPressedThisFrame) Select(1);
+            if (kb.rightArrowKey.wasPressedThisFrame || kb.dKey.wasPressedThisFrame) Select(2);
+            if (selected >= 0 && (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame))
+            {
+                Decide();
+                return;
+            }
+        }
+
         Gamepad pad = GetPad();
         if (pad == null) return;
 
@@ -74,7 +88,6 @@ public class KoushuSelectUI : MonoBehaviour
             if (stick.y > 0 && Mathf.Abs(stick.x) < stick.y) next = 0;  // 上
             else if (stick.x < 0) next = 1;                              // 左下
             else next = 2;                                               // 右下
-
             if (next != selected) Select(next);
         }
 
@@ -87,6 +100,7 @@ public class KoushuSelectUI : MonoBehaviour
 
     private void Select(int index)
     {
+        if (index == selected) return;
         // 前の選択を等倍に戻す
         if (selected >= 0)
         {

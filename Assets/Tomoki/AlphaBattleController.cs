@@ -47,6 +47,43 @@ public class AlphaBattleController : MonoBehaviour
 
         UpdateCostText();
         if (messageText != null) messageText.text = "";
+        RouteMouseButtons();
+    }
+
+    // マウスで押す 4つのボタンも、コストを払ってから技を出すようにつなぎ替える（シーンのデータは変えない）
+    private void RouteMouseButtons()
+    {
+        foreach (var button in FindObjectsByType<Button>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+        {
+            for (int i = 0; i < button.onClick.GetPersistentEventCount(); i++)
+            {
+                if (!(button.onClick.GetPersistentTarget(i) is TechiqueSelector)) continue;
+                DhukusiInput.DhukusiType type;
+                switch (button.onClick.GetPersistentMethodName(i))
+                {
+                    case "SelectNormal": type = DhukusiInput.DhukusiType.Normal; break;
+                    case "SelectFeint":  type = DhukusiInput.DhukusiType.Feint; break;
+                    case "SelectCombo":  type = DhukusiInput.DhukusiType.Renzoku; break;
+                    case "SelectHeavy":  type = DhukusiInput.DhukusiType.Gekiomo; break;
+                    default: continue;
+                }
+                button.onClick.SetPersistentListenerState(i, UnityEngine.Events.UnityEventCallState.Off);
+                button.onClick.AddListener(() => SelectWithCost(type));
+            }
+        }
+    }
+
+    private void SelectWithCost(DhukusiInput.DhukusiType type)
+    {
+        if (DhukusiInput.Instance.Phase != DhukusiInput.InputPhase.Select) return;   // 攻撃中・防御中は選べない
+        var cost = CostManager.Instance;
+        if (!cost.CanUse(0, type))
+        {
+            ShowMessage("コストが足りない！");
+            return;
+        }
+        cost.Pay(0, cost.GetCost(type));
+        OnDecided(type);
     }
 
     void Update()
