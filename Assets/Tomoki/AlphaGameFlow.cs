@@ -141,8 +141,8 @@ public class AlphaGameFlow : MonoBehaviour
         ui.ShowPhase(PhaseUIManager.UIPhase.None);   // パネルを閉じて HUD だけ出す
         if (battleCanvas != null) battleCanvas.SetActive(true);
         if (hideInBattle != null) foreach (var g in hideInBattle) if (g != null) g.SetActive(false);
-        Arrange(messageText, new Vector2(0, 110), 48);
-        Arrange(actionText, new Vector2(0, 175), 60);
+        Arrange(messageText, new Vector2(0, 70), 40);
+        Arrange(actionText, new Vector2(0, 140), 44);
         inBattle = true;
         setEnding = false;
         if (DhukusiInput.Instance != null) DhukusiInput.Instance.Phase = DhukusiInput.InputPhase.Select;

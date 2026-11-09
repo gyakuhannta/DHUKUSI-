@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
@@ -29,9 +29,17 @@ public class DhukusiSelectUI : MonoBehaviour
     [SerializeField] private float blinkInterval = 0.1f;
     [SerializeField] private int blinkCount = 3;
 
+    private Color[] baseColors;   // もとの色（青・緑・黄・赤）
     private int blinkIndex = -1;
     private float blinkTimer;
     private int blinkDone;
+
+    void Awake()
+    {
+        baseColors = new Color[dhukusiImages.Length];
+        for (int i = 0; i < dhukusiImages.Length; i++)
+            baseColors[i] = dhukusiImages[i] != null ? dhukusiImages[i].color : Color.white;
+    }
 
     void OnEnable()
     {
@@ -65,7 +73,7 @@ public class DhukusiSelectUI : MonoBehaviour
             {
                 if (dhukusiImages[i] == null) continue;
                 bool canUse = CostManager.Instance.CanUse(player, (DhukusiInput.DhukusiType)i);
-                dhukusiImages[i].color = canUse ? Color.white : disabledColor;
+                dhukusiImages[i].color = canUse ? baseColors[i] : baseColors[i] * disabledColor;   // 色はそのまま、足りないときだけ暗く
             }
         }
 

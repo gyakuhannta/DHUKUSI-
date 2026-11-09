@@ -117,6 +117,20 @@ public static class DhukusiAlphaSetup
             if (canvasArata != null)
                 foreach (var tmp in canvasArata.rootCanvas.GetComponentsInChildren<TMPro.TMP_Text>(true))
                     if (tmp.name == "SelectedText" && tmp.transform != msgRect) hide.Add(tmp.gameObject);
+            // 技選択の画面（下の 4つのデュクシ）。仕様書：選択中は 0.8倍、決定で 0.1秒ずつ 4回点滅
+            var selectPanel = Find(ui.transform, "Panel_DhukusiSelect_Attack");
+            var cso = new SerializedObject(ctrl);
+            cso.FindProperty("selectPanel").objectReferenceValue = selectPanel != null ? selectPanel.gameObject : null;
+            cso.ApplyModifiedPropertiesWithoutUndo();
+            var selUI = selectPanel != null ? selectPanel.GetComponent<DhukusiSelectUI>() : null;
+            if (selUI != null)
+            {
+                var dso = new SerializedObject(selUI);
+                dso.FindProperty("pressScale").floatValue = 0.8f;
+                dso.FindProperty("blinkInterval").floatValue = 0.1f;
+                dso.FindProperty("blinkCount").intValue = 4;
+                dso.ApplyModifiedPropertiesWithoutUndo();
+            }
             var hp = fso.FindProperty("hideInBattle");
             hp.arraySize = hide.Count;
             for (int i = 0; i < hide.Count; i++) hp.GetArrayElementAtIndex(i).objectReferenceValue = hide[i];
