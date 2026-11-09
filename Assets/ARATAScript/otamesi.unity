@@ -268,9 +268,9 @@ GameObject:
   - component: {fileID: 189356393}
   - component: {fileID: 189356391}
   - component: {fileID: 189356394}
+  - component: {fileID: 189356398}
   - component: {fileID: 189356397}
   - component: {fileID: 189356396}
-  - component: {fileID: 189356395}
   m_Layer: 0
   m_Name: Gamemanager
   m_TagString: Untagged
@@ -285,7 +285,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 189356390}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: cbe84877da0c37e4ba00f2b5cebdc7c2, type: 3}
   m_Name: 
@@ -320,7 +320,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TechiqueSelector
   selectedText: {fileID: 1160069941}
   attackTiming: {fileID: 189356394}
-  timingJudge: {fileID: 189356397}
 --- !u!114 &189356394
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -340,21 +339,6 @@ MonoBehaviour:
   speed: 300
   leftLimit: 140
   rightLimit: 740
---- !u!114 &189356395
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 189356390}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c754a04f5d466a3479a88950349f4d0a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
-  enemyLife: 2
-  lifeText: {fileID: 1621198782}
-  resultText: {fileID: 1454305992}
 --- !u!114 &189356396
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -391,6 +375,19 @@ MonoBehaviour:
   - {fileID: 1132704041}
   actionText: {fileID: 196157917}
   player: {fileID: 1792802686}
+--- !u!114 &189356398
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 189356390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1003676592753b447999d1b2e0aa4fd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackController
+  timingJudge: {fileID: 189356397}
 --- !u!1 &196157915
 GameObject:
   m_ObjectHideFlags: 0
@@ -686,7 +683,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 462937669}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 49616427c09aa4244832345d276263b0, type: 3}
   m_Name: 
@@ -888,7 +885,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 189356393}
         m_TargetAssemblyTypeName: TechiqueSelector, Assembly-CSharp
         m_MethodName: SelectFeint
         m_Mode: 1
@@ -1158,7 +1155,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 189356393}
         m_TargetAssemblyTypeName: TechiqueSelector, Assembly-CSharp
         m_MethodName: SelectCombo
         m_Mode: 1
@@ -1479,8 +1476,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: eranndene
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
-  m_sharedMaterial: {fileID: 2180264, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 97ac80127217abf47ab83a55971323df, type: 2}
+  m_sharedMaterial: {fileID: -514462789346107517, guid: 97ac80127217abf47ab83a55971323df, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1662,11 +1659,11 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 1299600926}
-  - {fileID: 462937670}
   - {fileID: 1381980283}
   - {fileID: 416797647}
   - {fileID: 1874571627}
   - {fileID: 1132704041}
+  - {fileID: 462937670}
   m_Father: {fileID: 495210276}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1381980282
@@ -1964,7 +1961,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 189356393}
         m_TargetAssemblyTypeName: TechiqueSelector, Assembly-CSharp
         m_MethodName: SelectNormal
         m_Mode: 1
@@ -2544,7 +2541,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 0}
+      - m_Target: {fileID: 189356393}
         m_TargetAssemblyTypeName: TechiqueSelector, Assembly-CSharp
         m_MethodName: SelectHeavy
         m_Mode: 1
