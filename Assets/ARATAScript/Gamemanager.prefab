@@ -1,0 +1,134 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &981460974015641217
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2090835871057509043}
+  - component: {fileID: 6462407994732300318}
+  - component: {fileID: 5418111564147738485}
+  - component: {fileID: 9175777314989286934}
+  - component: {fileID: 721719414858562593}
+  - component: {fileID: 3349983265124269384}
+  - component: {fileID: 8353484907311461547}
+  m_Layer: 0
+  m_Name: Gamemanager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2090835871057509043
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981460974015641217}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -0, y: 0, z: -0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6462407994732300318
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981460974015641217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d79e29ab13154cc488b7eb44ae0b64a9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TechiqueSelector
+  selectedText: {fileID: 0}
+  attackTiming: {fileID: 9175777314989286934}
+--- !u!114 &5418111564147738485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981460974015641217}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: cbe84877da0c37e4ba00f2b5cebdc7c2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimingBarController
+  timingBar: {fileID: 0}
+--- !u!114 &9175777314989286934
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981460974015641217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: accd1eb61fd333540b637e0b4ef793dc, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::AtttackTimingController
+  timingBar: {fileID: 0}
+  cursor: {fileID: 0}
+  resultText: {fileID: 0}
+  enemy: {fileID: 8353484907311461547}
+  speed: 300
+  leftLimit: 140
+  rightLimit: 740
+--- !u!114 &721719414858562593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981460974015641217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 1003676592753b447999d1b2e0aa4fd8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyAttackController
+  timingJudge: {fileID: 3349983265124269384}
+--- !u!114 &3349983265124269384
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981460974015641217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 086e78b11a724d2498e620c3ee46c024, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TimingJudge
+  timingBar: {fileID: 0}
+  cursor: {fileID: 0}
+  successZones:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  actionText: {fileID: 0}
+  player: {fileID: 0}
+--- !u!114 &8353484907311461547
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 981460974015641217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c754a04f5d466a3479a88950349f4d0a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::EnemyController
+  enemyLife: 2
+  lifeText: {fileID: 0}
+  resultText: {fileID: 0}
