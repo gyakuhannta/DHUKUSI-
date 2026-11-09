@@ -9,6 +9,8 @@ public class AttackTimingController : MonoBehaviour
     [SerializeField] private TMP_Text resultText;
     [SerializeField] private EnemyController enemy;
 
+
+
     [Header("カーソルの設定")]
     [SerializeField] private float speed = 300f;
     [SerializeField] private float leftLimit = -290f;
@@ -110,7 +112,13 @@ public class AttackTimingController : MonoBehaviour
 
     private void StartEnemyDefense()
     {
-        FindFirstObjectByType<TimingJudge>().StartDefense();
+        EnemyAttackController enemyAttack =
+            FindFirstObjectByType<EnemyAttackController>();
+
+        if (enemyAttack != null)
+        {
+            enemyAttack.StartEnemyAttack();
+        }
     }
     // タイミングバーを消す
     private void HideTimingBar()
