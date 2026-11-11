@@ -29,6 +29,9 @@ public class DhukusiSelectUI : MonoBehaviour
     [SerializeField] private float blinkInterval = 0.1f;
     [SerializeField] private int blinkCount = 3;
 
+    /// <summary>コストが足りないデュクシを暗くするか（防御では false）</summary>
+    public bool UseCost { get; set; } = true;
+
     private Color[] baseColors;   // もとの色（青・緑・黄・赤）
     private int blinkIndex = -1;
     private float blinkTimer;
@@ -66,7 +69,7 @@ public class DhukusiSelectUI : MonoBehaviour
         if (input == null) return;
 
         // ---- コストが足りないデュクシを暗くする ----
-        if (CostManager.Instance != null)
+        if (CostManager.Instance != null && UseCost)
         {
             int player = input.ActivePlayer >= 0 ? input.ActivePlayer : input.LastPlayer;
             for (int i = 0; i < dhukusiImages.Length; i++)

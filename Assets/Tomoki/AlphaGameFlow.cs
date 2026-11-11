@@ -31,6 +31,7 @@ public class AlphaGameFlow : MonoBehaviour
     [SerializeField] private Image[] set1P = new Image[2];
     [SerializeField] private Image[] set2P = new Image[2];
     [SerializeField] private Text costText;
+    [SerializeField] private Text timerText;   // 経過時間（空なら Timer_Text を自動で探す）
 
     [Header("戦闘（Gamemanager / Player）")]
     [SerializeField] private PlayerLifeController player;
@@ -57,12 +58,14 @@ public class AlphaGameFlow : MonoBehaviour
     [Header("色")]
     [SerializeField] private Color onColor = new Color32(0xf8, 0xb5, 0x00, 0xff);
     [SerializeField] private Color offColor = new Color(0.25f, 0.25f, 0.25f, 0.8f);
+    [SerializeField] private Color lifeColor = new Color32(0xe5, 0x39, 0x35, 0xff);   // 残っているライフは赤
 
     private FieldInfo playerLifeField, enemyLifeField;
     private MethodInfo playerUpdateText, enemyUpdateText;
     private FieldInfo enemyResultTextField;
 
     private int sets1P, sets2P;
+    private float elapsed;
     private bool inBattle;
     private bool setEnding;
 
@@ -78,6 +81,10 @@ public class AlphaGameFlow : MonoBehaviour
         if (player == null) player = FindFirstObjectByType<PlayerLifeController>();
         if (enemy == null) enemy = FindFirstObjectByType<EnemyController>();
         if (enemyAttack == null) enemyAttack = FindFirstObjectByType<EnemyAttackController>();
+
+        if (timerText == null && ui != null)
+            foreach (var t in ui.GetComponentsInChildren<Text>(true))
+                if (t.name == "Timer_Text") timerText = t;
 
         if (koushuSelect != null) koushuSelect.OnDecided += OnKoushuDecided;
         if (CostManager.Instance != null) CostManager.Instance.OnCostChanged += (p, c, m) => UpdateHud();
@@ -125,6 +132,7 @@ public class AlphaGameFlow : MonoBehaviour
             yield break;
         }
         CostManager.Instance?.Pay(0, koushuCosts[mine]);
+        CostManager.Instance?.Pay(1, koushuCosts[cpu]);   // 相手も払う
         StartBattle(result > 0);
     }
 
@@ -141,8 +149,8 @@ public class AlphaGameFlow : MonoBehaviour
         ui.ShowPhase(PhaseUIManager.UIPhase.None);   // パネルを閉じて HUD だけ出す
         if (battleCanvas != null) battleCanvas.SetActive(true);
         if (hideInBattle != null) foreach (var g in hideInBattle) if (g != null) g.SetActive(false);
-        Arrange(messageText, new Vector2(0, 70), 40);
-        Arrange(actionText, new Vector2(0, 140), 44);
+        Arrange(messageText, new Vector2(0, 70), 40, Color.white);
+        Arrange(actionText, new Vector2(0, 150), 48, onColor);   // 防御成功／失敗は山吹色
         inBattle = true;
         setEnding = false;
         if (DhukusiInput.Instance != null) DhukusiInput.Instance.Phase = DhukusiInput.InputPhase.Select;
@@ -153,7 +161,13 @@ public class AlphaGameFlow : MonoBehaviour
 
     void Update()
     {
-        if (!inBattle || setEnding) return;
+        if (!inBattle) return;
+
+        // 経過時間（戦闘が始まってから。勝敗が決まるまで数える）
+        elapsed += Time.deltaTime;
+        if (timerText != null) timerText.text = $"経過時間 {(int)elapsed / 60:00}:{(int)elapsed % 60:00}";
+
+        if (setEnding) return;
         UpdateHud();
 
         int pl = PlayerLife, en = EnemyLife;
@@ -181,6 +195,7 @@ public class AlphaGameFlow : MonoBehaviour
         // 次のセット：ライフとコストを元に戻す
         SetLife(maxLife, maxLife);
         CostManager.Instance?.ResetAll();
+        FindFirstObjectByType<AlphaBattleController>()?.OnSetReset();
         if (enemyResultTextField?.GetValue(enemy) is TMPro.TMP_Text rt) rt.text = $"第{sets1P + sets2P + 1}セット！";
         setEnding = false;
         UpdateHud();
@@ -194,16 +209,26 @@ public class AlphaGameFlow : MonoBehaviour
     {
         int pl = player != null ? PlayerLife : maxLife;
         int en = enemy != null ? EnemyLife : maxLife;
-        for (int i = 0; i < life1P.Length; i++) if (life1P[i] != null) life1P[i].color = i < pl ? onColor : offColor;
-        for (int i = 0; i < life2P.Length; i++) if (life2P[i] != null) life2P[i].color = i < en ? onColor : offColor;
-        for (int i = 0; i < set1P.Length; i++) if (set1P[i] != null) set1P[i].color = i < sets1P ? onColor : offColor;
-        for (int i = 0; i < set2P.Length; i++) if (set2P[i] != null) set2P[i].color = i < sets2P ? onColor : offColor;
+        // 仕様書：ライフは目（Eyes）。減ったら消える
+        for (int i = 0; i < life1P.Length; i++) if (life1P[i] != null) { life1P[i].enabled = i < pl; life1P[i].color = Color.white; }
+        for (int i = 0; i < life2P.Length; i++) if (life2P[i] != null) { life2P[i].enabled = i < en; life2P[i].color = Color.white; }
+        // セット（はちまき）：取ったらはっきり、まだなら薄く
+        for (int i = 0; i < set1P.Length; i++) if (set1P[i] != null) set1P[i].color = i < sets1P ? Color.white : SetOff;
+        for (int i = 0; i < set2P.Length; i++) if (set2P[i] != null) set2P[i].color = i < sets2P ? Color.white : SetOff;
+        // 仕様書「コスト仕様」：選択を始めたときのコスト（防御中は相手のコスト）。戦闘前は今のコスト
         if (costText != null && CostManager.Instance != null)
-            costText.text = $"{CostManager.Instance.GetCurrentCost(0)}/{CostManager.Instance.MaxCost}";
+        {
+            costText.text = inBattle && AlphaBattleController.CostDisplay != null
+                ? AlphaBattleController.CostDisplay
+                : $"{CostManager.Instance.GetCurrentCost(0)}/{CostManager.Instance.MaxCost}";
+            if (costLabel == null && costText.transform.parent != null)
+                costLabel = costText.transform.parent.Find("Cost_Label")?.GetComponent<Text>();
+            if (costLabel != null) costLabel.text = inBattle && AlphaBattleController.CostLabel != null ? AlphaBattleController.CostLabel : "残りコスト";
+        }
     }
 
     // 文字が折り返して重ならないように、1行で決まった位置に出す
-    private static void Arrange(RectTransform rt, Vector2 pos, float size)
+    private static void Arrange(RectTransform rt, Vector2 pos, float size, Color color)
     {
         if (rt == null) return;
         rt.anchorMin = rt.anchorMax = rt.pivot = new Vector2(0.5f, 0.5f);
@@ -215,10 +240,13 @@ public class AlphaGameFlow : MonoBehaviour
         t.enableAutoSizing = false;
         t.fontSize = size;
         t.alignment = TMPro.TextAlignmentOptions.Center;
-        t.color = Color.white;
+        t.color = color;
         t.outlineWidth = 0.25f;
         t.outlineColor = Color.black;
     }
+
+    private Text costLabel;
+    private static readonly Color SetOff = new Color(1f, 1f, 1f, 0.25f);
 
     private int PlayerLife => (int)playerLifeField.GetValue(player);
     private int EnemyLife => (int)enemyLifeField.GetValue(enemy);
