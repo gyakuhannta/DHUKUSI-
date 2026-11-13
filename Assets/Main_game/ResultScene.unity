@@ -157,7 +157,7 @@ MonoBehaviour:
   blinkOnTime: 0.3
   blinkCount: 3
   sceneForSelection1: mineSeen
-  sceneForSelection2: Titl
+  sceneForSelection2: Title&selectScene
   minHoldDuration: 0.3
   cancelHoldDuration: 3
   holdProgressImage: {fileID: 0}

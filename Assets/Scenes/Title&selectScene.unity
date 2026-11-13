@@ -1210,7 +1210,7 @@ MonoBehaviour:
   blinkOffTime: 0.3
   blinkOnTime: 0.3
   blinkCount: 3
-  sceneForSelection1: SEBGMadjustment
+  sceneForSelection1: mineSeen
   sceneForSelection2: 
   minHoldDuration: 0.3
   cancelHoldDuration: 3
