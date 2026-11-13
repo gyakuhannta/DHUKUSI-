@@ -74,6 +74,7 @@ public class AlphaGameFlow : MonoBehaviour
     void Awake()
     {
         InBattle = false;
+        FixAllTmpMaterials();
     }
 
     void Start()
@@ -248,8 +249,30 @@ public class AlphaGameFlow : MonoBehaviour
         t.fontSize = size;
         t.alignment = TMPro.TextAlignmentOptions.Center;
         t.color = color;
+        if (!FixTmpMaterial(t)) return;   // マテリアルが無いと縁取りでエラーになるので、そのときは縁取りしない
         t.outlineWidth = 0.25f;
         t.outlineColor = Color.black;
+    }
+
+    // TextMeshPro の文字のマテリアルが消えていたら、フォントのマテリアルを入れ直す
+    //  （パソコンによってフォントの読み込み直しでマテリアルが外れることがある）
+    private static bool FixTmpMaterial(TMPro.TMP_Text t)
+    {
+        if (t == null) return false;
+        if (t.fontSharedMaterial != null) return true;
+        var font = t.font;
+        if (font == null || font.material == null) font = TMPro.TMP_Settings.defaultFontAsset;
+        if (font == null || font.material == null) return false;
+        t.font = font;
+        t.fontSharedMaterial = font.material;
+        return true;
+    }
+
+    // シーンの中の TextMeshPro の文字を全部チェックする
+    private static void FixAllTmpMaterials()
+    {
+        foreach (var t in FindObjectsByType<TMPro.TMP_Text>(FindObjectsInactive.Include, FindObjectsSortMode.None))
+            FixTmpMaterial(t);
     }
 
     private Text costLabel;
