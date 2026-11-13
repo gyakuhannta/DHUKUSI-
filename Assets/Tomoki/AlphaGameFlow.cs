@@ -67,7 +67,14 @@ public class AlphaGameFlow : MonoBehaviour
     private int sets1P, sets2P;
     private float elapsed;
     private bool inBattle;
+    /// <summary>攻撃・防御をしている間だけ true（攻守決めや勝敗の間は false）。AlphaBattleController が見る</summary>
+    public static bool InBattle { get; private set; }
     private bool setEnding;
+
+    void Awake()
+    {
+        InBattle = false;
+    }
 
     void Start()
     {
@@ -95,7 +102,7 @@ public class AlphaGameFlow : MonoBehaviour
     // ===================== 1. 攻守決め =====================
     private IEnumerator BeginKoushu(float delay)
     {
-        inBattle = false;
+        inBattle = false; InBattle = false;
         yield return new WaitForSeconds(delay);
         if (DhukusiInput.Instance != null) DhukusiInput.Instance.Phase = DhukusiInput.InputPhase.None;
         if (battleCanvas != null) battleCanvas.SetActive(false);
@@ -151,7 +158,7 @@ public class AlphaGameFlow : MonoBehaviour
         if (hideInBattle != null) foreach (var g in hideInBattle) if (g != null) g.SetActive(false);
         Arrange(messageText, new Vector2(0, 70), 40, Color.white);
         Arrange(actionText, new Vector2(0, 150), 48, onColor);   // 防御成功／失敗は山吹色
-        inBattle = true;
+        inBattle = true; InBattle = true;
         setEnding = false;
         if (DhukusiInput.Instance != null) DhukusiInput.Instance.Phase = DhukusiInput.InputPhase.Select;
 
@@ -187,7 +194,7 @@ public class AlphaGameFlow : MonoBehaviour
 
         if (sets1P >= setsToWin || sets2P >= setsToWin)
         {
-            inBattle = false;
+            inBattle = false; InBattle = false;
             ResultView.ShowPvE(sets1P >= setsToWin);   // 4. 勝敗判定へ
             yield break;
         }

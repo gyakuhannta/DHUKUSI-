@@ -157,6 +157,16 @@ public class AlphaBattleController : MonoBehaviour
             warnedMissing = true;
             return;
         }
+        // 攻守決め・勝敗の間は、技選択も防御も出さない（何もしない）
+        if (!AlphaGameFlow.InBattle)
+        {
+            if (heldByBanner) { heldByBanner = false; }
+            playerTurnStarted = false;
+            if (selectPanel != null && selectPanel.activeSelf && !deciding) selectPanel.SetActive(false);
+            if (defensePanel != null && defensePanel.activeSelf) defensePanel.SetActive(false);
+            return;
+        }
+
         bool attacking = IsAttacking();
         bool defending = IsDefending();
         bool isTiming = attacking || defending;
