@@ -80,8 +80,11 @@ public class AlphaGameFlow : MonoBehaviour
     void Start()
     {
         const BindingFlags f = BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public;
-        playerLifeField = typeof(PlayerLifeController).GetField("playerLife", f);
-        enemyLifeField = typeof(EnemyController).GetField("enemyLife", f);
+        // ライフの変数名は新井くんの版によってちがう（playerLife / enemyLife か currentLife）ので、両方さがす
+        playerLifeField = typeof(PlayerLifeController).GetField("playerLife", f) ?? typeof(PlayerLifeController).GetField("currentLife", f);
+        enemyLifeField = typeof(EnemyController).GetField("enemyLife", f) ?? typeof(EnemyController).GetField("currentLife", f);
+        if (playerLifeField == null || enemyLifeField == null)
+            Debug.LogError("[流れ] PlayerLifeController / EnemyController のライフの変数が見つかりません");
         playerUpdateText = typeof(PlayerLifeController).GetMethod("UpdateLifeText", f);
         enemyUpdateText = typeof(EnemyController).GetMethod("UpdateLifeText", f);
         enemyResultTextField = typeof(EnemyController).GetField("resultText", f);
