@@ -55,7 +55,19 @@ public class AlphaBattleController : MonoBehaviour
     public static string CostDisplay;   // HUD の「5/10」の所に出す文字（AlphaGameFlow が使う）
     public static string CostLabel;     // HUD の「残りコスト」の所に出す文字
     private readonly bool[] skipped = new bool[2];   // [0]=自分 [1]=相手：コスト0で 1回休んだか
-    private bool selectReadyBefore, defendingBefore, playerSkipping;
+    private bool playerTurnStarted, defendingBefore, playerSkipping;
+
+    // ---- 攻守が切り替わるときの大きい帯（「相手の攻撃！」「防御成功！」「あなたの攻撃！」など）----
+    private RectTransform bannerRoot, bannerBand;
+    private Text bannerText;
+    private Coroutine bannerCo;
+    private float bannerUntil;
+    private bool heldByBanner, enemySkipFlag;
+    private bool BannerBusy => Time.time < bannerUntil;
+    private static readonly Color BannerYellow = new Color32(0xf8, 0xb5, 0x00, 0xff);
+    private static readonly Color BannerRed    = new Color32(0xff, 0x5a, 0x4a, 0xff);
+    private static readonly Color BannerBlue   = new Color32(0x6f, 0xc3, 0xff, 0xff);
+    private static readonly Color BannerGray   = new Color32(0xc8, 0xc8, 0xc8, 0xff);
     private static readonly DhukusiInput.DhukusiType[] ZoneTypes =
     {
         DhukusiInput.DhukusiType.Normal, DhukusiInput.DhukusiType.Feint,
@@ -150,7 +162,7 @@ public class AlphaBattleController : MonoBehaviour
         bool isTiming = attacking || defending;
 
         // 入力の受け付けを切り替える（攻撃中＝タイミング、防御中＝自分で読む、それ以外＝技選択）
-        bool battleInput = input.Phase != DhukusiInput.InputPhase.None || noneByDefense;   // 攻守決めの間（None）は何もしない
+        bool battleInput = input.Phase != DhukusiInput.InputPhase.None || noneByDefense || heldByBanner;   // 攻守決めの間（None）は何もしない
         if (isTiming != wasTiming && battleInput)
         {
             input.Phase = isTiming ? DhukusiInput.InputPhase.Timing : DhukusiInput.InputPhase.Select;
@@ -166,6 +178,12 @@ public class AlphaBattleController : MonoBehaviour
         if (defending != wasDefending)
         {
             ShowGuide("");   // 防御の案内は右の吹き出しに出ている
+            if (!defending)
+            {
+                // 防御が終わった：結果を大きく出す（相手がコスト切れで休んだときは出さない）
+                if (!enemySkipFlag) ShowDefenseResult();
+                enemySkipFlag = false;
+            }
             wasDefending = defending;
         }
         if (attacking != wasAttacking)
@@ -174,17 +192,23 @@ public class AlphaBattleController : MonoBehaviour
             // 攻撃中はバーと重ならないように、案内をバーの下に出す
             if (messageText != null)
                 ((RectTransform)messageText.transform).anchoredPosition = new Vector2(0, attacking ? -190 : -75);
+            if (!attacking && wasAttacking) ShowAttackResult();   // 攻撃が終わった：結果を大きく出す
             wasAttacking = attacking;
         }
 
         // 技を選べるときだけ、下の 4つのデュクシを出す
         // 攻撃の結果を出してから敵の攻撃が始まるまで（約2秒）は選べない
         bool waitingEnemy = attackTiming != null && attackTiming.IsInvoking("StartEnemyDefense");
-        bool selectReady = input.Phase == DhukusiInput.InputPhase.Select && !isTiming && !waitingEnemy && !deciding;
+        bool selectReady = (input.Phase == DhukusiInput.InputPhase.Select || heldByBanner) && !isTiming && !waitingEnemy && !deciding;
 
         // 自分の攻撃ターン／相手の攻撃ターンが始まったとき、コストの処理をする
-        if (selectReady && !selectReadyBefore) BeginPlayerTurn();
-        selectReadyBefore = selectReady;
+        //  （前の帯が出ている間は待ってから、自分のターンを始める）
+        if (!selectReady) playerTurnStarted = false;
+        else if (!playerTurnStarted && !BannerBusy)
+        {
+            playerTurnStarted = true;
+            BeginPlayerTurn();
+        }
         if (defending && !defendingBefore)
         {
             defendingBefore = true;
@@ -192,7 +216,20 @@ public class AlphaBattleController : MonoBehaviour
         }
         if (!defending) defendingBefore = false;
 
-        bool canSelect = selectReady && !playerSkipping;
+        bool canSelect = selectReady && playerTurnStarted && !playerSkipping && !BannerBusy;
+
+        // 帯が出ている間・休みの間は、コントローラーで技を選べないようにする
+        bool hold = selectReady && !canSelect;
+        if (hold && input.Phase == DhukusiInput.InputPhase.Select)
+        {
+            input.Phase = DhukusiInput.InputPhase.None;
+            heldByBanner = true;
+        }
+        else if (!hold && heldByBanner)
+        {
+            heldByBanner = false;
+            if (canSelect) input.Phase = DhukusiInput.InputPhase.Select;
+        }
         if (selectPanel != null && selectPanel.activeSelf != (canSelect || deciding))
             selectPanel.SetActive(canSelect || deciding);
         if (defensePanel != null && defensePanel.activeSelf != defending)
@@ -203,7 +240,7 @@ public class AlphaBattleController : MonoBehaviour
         TidyTexts(defending);
 
         // ---- 防御：Y=通常 X=フェイント B=連続 A=激重（キーボードは 1〜4）----
-        if (defending)
+        if (defending && !BannerBusy)   // 「相手の攻撃！」が出ている間は押せない
         {
             int guard = ReadGuard();
             if (guard >= 0) Defend(guard);
@@ -241,7 +278,7 @@ public class AlphaBattleController : MonoBehaviour
             // 「防御成功！」「防御失敗！」は防御が終わってから 1.5秒だけ出す
             if (defending) defenseEndTime = -1f;
             else if (defenseEndTime < 0f) defenseEndTime = Time.time;
-            bool showAction = !defending && actionTmp.text.StartsWith("防御") && Time.time - defenseEndTime < 1.5f;
+            bool showAction = false;   // 防御の結果は大きい帯で出す
             if (actionTmp.enabled != showAction) actionTmp.enabled = showAction;
         }
         if (resultTmp != null && defending && resultTmp.text != "") resultTmp.text = "";
@@ -297,6 +334,101 @@ public class AlphaBattleController : MonoBehaviour
         messageText.text = text;
     }
 
+    // ===================== 帯 =====================
+    private void ShowAttackResult()
+    {
+        bool ok = resultTmp != null && resultTmp.text.Contains("成功");
+        if (resultTmp != null) resultTmp.text = "";   // 同じことが小さい字でも出ないように
+        ShowBanner(ok ? ("攻撃成功！", BannerYellow) : ("攻撃失敗…", BannerGray));
+    }
+
+    private void ShowDefenseResult()
+    {
+        bool ok = actionTmp != null && actionTmp.text.StartsWith("防御成功");
+        ShowBanner(ok ? ("防御成功！", BannerBlue) : ("防御失敗…", BannerRed));
+    }
+
+    // 画面の真ん中に、黒い帯と大きい文字を 1つずつ出す（1つ 約0.9秒）
+    private void ShowBanner(params (string text, Color color)[] items)
+    {
+        if (!EnsureBanner()) return;
+        if (bannerCo != null) StopCoroutine(bannerCo);
+        bannerUntil = Time.time + items.Length * 0.9f;
+        bannerCo = StartCoroutine(BannerSeq(items));
+    }
+
+    private IEnumerator BannerSeq((string text, Color color)[] items)
+    {
+        bannerRoot.gameObject.SetActive(true);
+        foreach (var (text, color) in items)
+        {
+            bannerText.text = text;
+            bannerText.color = color;
+            for (float t = 0f; t < 0.15f; t += Time.deltaTime)   // 帯が開いて、文字が大きい所から縮む
+            {
+                float k = t / 0.15f;
+                bannerBand.localScale = new Vector3(1f, k, 1f);
+                bannerText.rectTransform.localScale = Vector3.one * Mathf.Lerp(1.6f, 1f, k);
+                bannerText.canvasRenderer.SetAlpha(k);
+                yield return null;
+            }
+            bannerBand.localScale = Vector3.one;
+            bannerText.rectTransform.localScale = Vector3.one;
+            bannerText.canvasRenderer.SetAlpha(1f);
+            yield return new WaitForSeconds(0.6f);
+            for (float t = 0f; t < 0.15f; t += Time.deltaTime)   // 閉じる
+            {
+                float k = 1f - t / 0.15f;
+                bannerBand.localScale = new Vector3(1f, k, 1f);
+                bannerText.canvasRenderer.SetAlpha(k);
+                yield return null;
+            }
+        }
+        bannerRoot.gameObject.SetActive(false);
+        bannerCo = null;
+    }
+
+    private bool EnsureBanner()
+    {
+        if (bannerRoot != null) return true;
+        if (messageText == null || messageText.canvas == null) return false;
+        var canvas = messageText.canvas.rootCanvas.transform;
+
+        var root = new GameObject("Phase_Banner", typeof(RectTransform));
+        root.transform.SetParent(canvas, false);
+        bannerRoot = (RectTransform)root.transform;
+        bannerRoot.anchorMin = Vector2.zero; bannerRoot.anchorMax = Vector2.one;
+        bannerRoot.offsetMin = bannerRoot.offsetMax = Vector2.zero;
+        bannerRoot.SetAsLastSibling();
+
+        var band = new GameObject("Band", typeof(RectTransform), typeof(Image));
+        band.transform.SetParent(bannerRoot, false);
+        bannerBand = (RectTransform)band.transform;
+        bannerBand.anchorMin = new Vector2(0f, 0.5f); bannerBand.anchorMax = new Vector2(1f, 0.5f);
+        bannerBand.sizeDelta = new Vector2(0f, 190f);
+        bannerBand.anchoredPosition = new Vector2(0f, 60f);
+        var img = band.GetComponent<Image>();
+        img.color = new Color(0f, 0f, 0f, 0.75f);
+        img.raycastTarget = false;
+
+        var txt = new GameObject("Text", typeof(RectTransform), typeof(Text), typeof(Outline));
+        txt.transform.SetParent(bannerBand, false);
+        var trt = (RectTransform)txt.transform;
+        trt.anchorMin = Vector2.zero; trt.anchorMax = Vector2.one;
+        trt.offsetMin = trt.offsetMax = Vector2.zero;
+        bannerText = txt.GetComponent<Text>();
+        bannerText.font = messageText.font;
+        bannerText.fontSize = 100;
+        bannerText.alignment = TextAnchor.MiddleCenter;
+        bannerText.horizontalOverflow = HorizontalWrapMode.Overflow;
+        bannerText.verticalOverflow = VerticalWrapMode.Overflow;
+        bannerText.raycastTarget = false;
+        txt.GetComponent<Outline>().effectColor = new Color(0f, 0f, 0f, 0.9f);
+
+        root.SetActive(false);
+        return true;
+    }
+
     // ===================== コスト =====================
     private void BeginPlayerTurn()
     {
@@ -310,7 +442,7 @@ public class AlphaBattleController : MonoBehaviour
                 CostLabel = "残りコスト";
                 CostDisplay = "選択不可";
                 playerSkipping = true;
-                ShowGuide("コストが 0 なので、このターンは攻撃できない！");
+                ShowBanner(("コスト0！ このターンは休み", BannerGray));
                 StartCoroutine(SkipPlayerTurn());
                 return;
             }
@@ -319,12 +451,12 @@ public class AlphaBattleController : MonoBehaviour
         }
         CostLabel = "残りコスト";
         CostDisplay = $"{cm.GetCurrentCost(0)}/{cm.MaxCost}";
+        ShowBanner(("あなたの攻撃！", BannerYellow));
     }
 
     private IEnumerator SkipPlayerTurn()
     {
-        yield return new WaitForSeconds(2f);
-        ShowGuide("");
+        while (BannerBusy) yield return null;
         playerSkipping = false;
         var enemyAttack = FindFirstObjectByType<EnemyAttackController>();
         if (enemyAttack != null) enemyAttack.StartEnemyAttack();
@@ -346,7 +478,8 @@ public class AlphaBattleController : MonoBehaviour
                 CostLabel = "相手の残りコスト";
                 CostDisplay = "選択不可";
                 t.GetMethod("EndDefense", f)?.Invoke(timingJudge, null);   // ダメージなしで防御を終わる
-                ShowMessage("相手はコスト切れで攻撃できない！");
+                enemySkipFlag = true;
+                ShowBanner(("相手はコスト切れ！ 攻撃なし", BannerGray));
                 return false;
             }
             skipped[1] = false;
@@ -367,6 +500,7 @@ public class AlphaBattleController : MonoBehaviour
         cm.Pay(1, cm.GetCost(ZoneTypes[zone]));
         CostLabel = "相手の残りコスト";
         CostDisplay = $"{before}/{cm.MaxCost}";
+        ShowBanner(("相手の攻撃！", BannerRed));
         return true;
     }
 

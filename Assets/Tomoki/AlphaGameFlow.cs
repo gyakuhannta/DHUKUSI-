@@ -212,9 +212,9 @@ public class AlphaGameFlow : MonoBehaviour
         // 仕様書：ライフは目（Eyes）。減ったら消える
         for (int i = 0; i < life1P.Length; i++) if (life1P[i] != null) { life1P[i].enabled = i < pl; life1P[i].color = Color.white; }
         for (int i = 0; i < life2P.Length; i++) if (life2P[i] != null) { life2P[i].enabled = i < en; life2P[i].color = Color.white; }
-        // セット（はちまき）：取ったらはっきり、まだなら薄く
-        for (int i = 0; i < set1P.Length; i++) if (set1P[i] != null) set1P[i].color = i < sets1P ? Color.white : SetOff;
-        for (int i = 0; i < set2P.Length; i++) if (set2P[i] != null) set2P[i].color = i < sets2P ? Color.white : SetOff;
+        // セット（はちまき）：取るまでは出さない。取ったら出てくる
+        for (int i = 0; i < set1P.Length; i++) if (set1P[i] != null) { set1P[i].enabled = i < sets1P; set1P[i].color = Color.white; }
+        for (int i = 0; i < set2P.Length; i++) if (set2P[i] != null) { set2P[i].enabled = i < sets2P; set2P[i].color = Color.white; }
         // 仕様書「コスト仕様」：選択を始めたときのコスト（防御中は相手のコスト）。戦闘前は今のコスト
         if (costText != null && CostManager.Instance != null)
         {
@@ -246,7 +246,6 @@ public class AlphaGameFlow : MonoBehaviour
     }
 
     private Text costLabel;
-    private static readonly Color SetOff = new Color(1f, 1f, 1f, 0.25f);
 
     private int PlayerLife => (int)playerLifeField.GetValue(player);
     private int EnemyLife => (int)enemyLifeField.GetValue(enemy);
