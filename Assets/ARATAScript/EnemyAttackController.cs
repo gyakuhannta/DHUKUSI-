@@ -4,6 +4,7 @@ public class EnemyAttackController : MonoBehaviour
 {
     [SerializeField] private TimingJudge timingJudge;
 
+    // “G‚ªg—p‚·‚é4í—Ş‚Ì‹Z
     private readonly string[] enemyTechniques =
     {
         "’Êíƒfƒ…ƒNƒV",
@@ -15,12 +16,15 @@ public class EnemyAttackController : MonoBehaviour
     // “G‚ÌUŒ‚‚ğŠJn‚·‚é
     public void StartEnemyAttack()
     {
+        // 0`3‚Ì’†‚©‚çƒ‰ƒ“ƒ_ƒ€‚É‘I‚Ô
         int randomIndex = Random.Range(0, 4);
 
+        // ‘I‚Î‚ê‚½‹Z‚Ì–¼‘O‚ğæ“¾
         string techniqueName = enemyTechniques[randomIndex];
 
         Debug.Log("“G‚Ì‹ZF" + techniqueName);
 
+        // TimingJudge‚É³‰ğƒ][ƒ“‚Æ‹Z–¼‚ğ“n‚·
         timingJudge.StartDefense(randomIndex, techniqueName);
     }
 }

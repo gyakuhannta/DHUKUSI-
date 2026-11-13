@@ -12,9 +12,7 @@ public class TimingJudge : MonoBehaviour
     [SerializeField] private RectTransform cursor;
 
     [Header("4‚Â‚Ì¬Œ÷ƒ][ƒ“")]
-    [SerializeField]
-    private RectTransform[] successZones =
-        new RectTransform[4];
+    [SerializeField] private RectTransform[] successZones = new RectTransform[4];
 
     [Header("‰æ–Ê‚É•\¦‚·‚é•¶š")]
     [SerializeField] private TMP_Text actionText;
@@ -33,8 +31,8 @@ public class TimingJudge : MonoBehaviour
     private int currentZone = -1;
     private int correctZone = -1;
     private string enemyTechnique = "";
-
     private bool isDefending = false;
+
 
     private void Start()
     {
@@ -68,7 +66,6 @@ public class TimingJudge : MonoBehaviour
         enemyTechnique = techniqueName;
 
         isDefending = true;
-
         timingBar.SetActive(true);
 
         actionText.text = "“G‚Ì‹ZF" + enemyTechnique;
@@ -132,18 +129,18 @@ public class TimingJudge : MonoBehaviour
     // ƒNƒŠƒbƒN‚µ‚½uŠÔ‚É”»’è
     private void JudgeAction()
     {
+        // ³‚µ‚¢ƒ][ƒ“‚È‚ç–hŒä¬Œ÷
         if (currentZone == correctZone)
         {
             actionText.text = "–hŒä¬Œ÷I";
-
             Debug.Log("–hŒä¬Œ÷I");
         }
         else
         {
             actionText.text = "–hŒä¸”sI";
-
             Debug.Log("–hŒä¸”sI");
 
+            // ƒvƒŒƒCƒ„[‚Éƒ_ƒ[ƒW
             player.TakeDamage();
         }
 

@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -89,10 +89,17 @@ public class TitleUI : MonoBehaviour
     {
         if (!goToModeSelect) return;
 
+        // コントローラーが無いときのテスト用：Enter / スペース
+        var kb = Keyboard.current;
+        bool key = kb != null && (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame);
+
         foreach (var pad in Gamepad.all)
         {
             var button = aButton == DecideButton.South ? pad.buttonSouth : pad.buttonEast;
-            if (button.wasPressedThisFrame)
+            if (button.wasPressedThisFrame) key = true;
+        }
+        {
+            if (key)
             {
                 Debug.Log("[タイトル] A ボタン → モード選択へ");
                 PhaseUIManager.Instance.ShowPhase(PhaseUIManager.UIPhase.ModeSelect);

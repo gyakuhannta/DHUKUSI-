@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -81,10 +81,17 @@ public class ModeSelectUI : MonoBehaviour
             SetSelected(Mathf.Clamp(Current + move, 0, options.Length - 1));
         }
 
+        // コントローラーが無いときのテスト用：Enter / スペース
+        var kb = Keyboard.current;
+        bool key = kb != null && (kb.enterKey.wasPressedThisFrame || kb.spaceKey.wasPressedThisFrame);
+
         foreach (var pad in Gamepad.all)
         {
             var button = aButton == DecideButton.South ? pad.buttonSouth : pad.buttonEast;
-            if (button.wasPressedThisFrame)
+            if (button.wasPressedThisFrame) key = true;
+        }
+        {
+            if (key)
             {
                 decided = true;
                 StartCoroutine(DecideAndBlink());
@@ -96,6 +103,14 @@ public class ModeSelectUI : MonoBehaviour
     /// <summary>上なら -1、下なら +1、何もなければ 0（どのコントローラーでも）</summary>
     private int ReadUpDown()
     {
+        // コントローラーが無いときのテスト用：↑↓ / W S
+        var kb = Keyboard.current;
+        if (kb != null)
+        {
+            if (kb.upArrowKey.wasPressedThisFrame || kb.wKey.wasPressedThisFrame) return -1;
+            if (kb.downArrowKey.wasPressedThisFrame || kb.sKey.wasPressedThisFrame) return +1;
+        }
+
         float y = 0f;   // 一番大きく倒しているスティック
         foreach (var pad in Gamepad.all)
         {
