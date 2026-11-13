@@ -2,33 +2,46 @@ using UnityEngine;
 using TMPro;
 public class PlayerLifeController : MonoBehaviour
 {
-    [SerializeField] private int playerLife = 2;
+    [Header("ライフ設定")]
+    [SerializeField] private int maxLife = 2;
+
+    [Header("画面表示")]
     [SerializeField] private TMP_Text lifeText;
+
+    private int currentLife;
 
     private void Start()
     {
+        currentLife = maxLife;
         UpdateLifeText();
     }
 
+    // ダメージを受ける
     public void TakeDamage()
     {
-        if (playerLife <= 0)
-        {
-            return;
-        }
+        currentLife--;
 
-        playerLife--;
+        if (currentLife < 0)
+        {
+            currentLife = 0;
+        }
 
         UpdateLifeText();
 
-        if (playerLife <= 0)
+        Debug.Log("プレイヤーの残りライフ：" + currentLife);
+
+        if (currentLife <= 0)
         {
-            lifeText.text = "敗北！";
+            Debug.Log("プレイヤーの敗北！");
         }
     }
 
+    // ライフ表示
     private void UpdateLifeText()
     {
-        lifeText.text = "プレイヤーのライフ：" + playerLife;
+        if (lifeText != null)
+        {
+            lifeText.text = "Player Life：" + currentLife;
+        }
     }
 }

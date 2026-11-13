@@ -3,40 +3,46 @@ using UnityEngine;
 
 public class EnemyController : MonoBehaviour
 {
-    [SerializeField] private int enemyLife = 2;
+    [Header("ライフ設定")]
+    [SerializeField] private int maxLife = 2;
+
+    [Header("画面表示")]
     [SerializeField] private TMP_Text lifeText;
-    [SerializeField] private TMP_Text resultText;
+
+    private int currentLife;
 
     private void Start()
     {
+        currentLife = maxLife;
         UpdateLifeText();
     }
 
-    // 敵がダメージを受ける
+    // ダメージを受ける
     public void TakeDamage()
     {
-        Debug.Log("TakeDamageが呼ばれました！");
+        currentLife--;
 
-        if (enemyLife <= 0)
+        if (currentLife < 0)
         {
-            return;
+            currentLife = 0;
         }
-
-        enemyLife--;
 
         UpdateLifeText();
 
-        Debug.Log("現在の敵ライフ：" + enemyLife);
+        Debug.Log("敵の残りライフ：" + currentLife);
 
-        if (enemyLife <= 0)
+        if (currentLife <= 0)
         {
-            resultText.text = "勝利！";
+            Debug.Log("敵の敗北！");
         }
     }
 
-    // ライフの表示を更新
+    // ライフ表示
     private void UpdateLifeText()
     {
-        lifeText.text = "敵のライフ：" + enemyLife;
+        if (lifeText != null)
+        {
+            lifeText.text = "Enemy Life：" + currentLife;
+        }
     }
 }

@@ -8,6 +8,7 @@ public class AttackTimingController : MonoBehaviour
     [SerializeField] private RectTransform cursor;
     [SerializeField] private TMP_Text resultText;
     [SerializeField] private EnemyController enemy;
+    [SerializeField] private EnemyAttackController enemyAttack;
 
     [Header("カーソルの設定")]
     [SerializeField] private float speed = 300f;
@@ -20,7 +21,6 @@ public class AttackTimingController : MonoBehaviour
 
     private void Start()
     {
-        // ゲーム開始時はバーを隠す
         timingBar.SetActive(false);
         resultText.text = "技を選んでください";
     }
@@ -32,8 +32,8 @@ public class AttackTimingController : MonoBehaviour
             return;
         }
 
-        // カーソルを左右に動かす
         Vector2 position = cursor.anchoredPosition;
+
         position.x += speed * direction * Time.deltaTime;
 
         if (position.x >= rightLimit)
@@ -49,7 +49,7 @@ public class AttackTimingController : MonoBehaviour
 
         cursor.anchoredPosition = position;
 
-        // マウスの左クリックでタイミングを決める
+        // マウス左クリック
         if (Mouse.current != null &&
             Mouse.current.leftButton.wasPressedThisFrame)
         {
@@ -57,7 +57,7 @@ public class AttackTimingController : MonoBehaviour
         }
     }
 
-    // 技を選んだときに呼び出す
+    // 攻撃タイミング開始
     public void StartAttackTiming(string techniqueName)
     {
         if (isAttacking)
@@ -78,21 +78,19 @@ public class AttackTimingController : MonoBehaviour
         isAttacking = true;
     }
 
-    // クリックした位置から攻撃タイミングを判定する
+    // 攻撃判定
     private void JudgeAttack()
     {
         isAttacking = false;
 
         float x = cursor.anchoredPosition.x;
 
-        // 中央付近なら攻撃成功
         if (x >= -40f && x <= 40f)
         {
             resultText.text = currentTechnique + "：攻撃成功！";
 
             Debug.Log("敵にダメージを与えました");
 
-            // 敵にダメージを与える
             enemy.TakeDamage();
         }
         else
@@ -100,21 +98,31 @@ public class AttackTimingController : MonoBehaviour
             resultText.text = currentTechnique + "：攻撃失敗...";
         }
 
-        // 2秒後にバーを消す
         Invoke(nameof(HideTimingBar), 2f);
-
-        // 攻撃判定が終わったら防御を開始
         Invoke(nameof(StartEnemyDefense), 2f);
     }
 
-
+    // 敵の防御・攻撃開始
     private void StartEnemyDefense()
     {
-        FindFirstObjectByType<TimingJudge>().StartDefense();
+        if (enemyAttack != null)
+        {
+            enemyAttack.StartEnemyAttack();
+        }
+        else
+        {
+            Debug.LogError("EnemyAttackControllerが登録されていません！");
+        }
     }
-    // タイミングバーを消す
+
     private void HideTimingBar()
     {
         timingBar.SetActive(false);
     }
+
+    public bool CanStartAttackTiming()
+    {
+        return !isAttacking;
+    }
+
 }

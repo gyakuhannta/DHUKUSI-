@@ -2,11 +2,14 @@ using UnityEngine;
 
 public class TimingCursor : MonoBehaviour
 {
+    [Header("à⁄ìÆê›íË")]
     [SerializeField] private float speed = 300f;
+
     [SerializeField] private float leftLimit = -290f;
     [SerializeField] private float rightLimit = 290f;
 
     private float direction = 1f;
+
     private RectTransform rectTransform;
 
     private void Awake()
@@ -15,11 +18,6 @@ public class TimingCursor : MonoBehaviour
     }
 
     private void Update()
-    {
-        MoveCursor();
-    }
-
-    private void MoveCursor()
     {
         Vector2 position = rectTransform.anchoredPosition;
 
