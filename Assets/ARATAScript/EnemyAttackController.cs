@@ -3,6 +3,7 @@ using UnityEngine;
 public class EnemyAttackController : MonoBehaviour
 {
     [SerializeField] private TimingJudge timingJudge;
+  
 
     // 敵が使用する4種類の技
     private readonly string[] enemyTechniques =
@@ -12,7 +13,7 @@ public class EnemyAttackController : MonoBehaviour
         "連続デュクシ",
         "激重デュクシ"
     };
-
+  
     // 敵の攻撃を開始する
     public void StartEnemyAttack()
     {
@@ -23,8 +24,9 @@ public class EnemyAttackController : MonoBehaviour
         string techniqueName = enemyTechniques[randomIndex];
 
         Debug.Log("敵の技：" + techniqueName);
-
+      
         // TimingJudgeに正解ゾーンと技名を渡す
         timingJudge.StartDefense(randomIndex, techniqueName);
+
     }
 }

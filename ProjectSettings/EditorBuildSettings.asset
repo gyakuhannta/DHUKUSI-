@@ -12,12 +12,6 @@ EditorBuildSettings:
     path: Assets/Scenes/Title&selectScene.unity
     guid: 1a6b3084252cb2d47841e2135ea5ca1d
   - enabled: 1
-    path: Assets/Scenes/SEBGMadjustment.unity
-    guid: d3282e88e5509a14c81db47cd325f46e
-  - enabled: 1
-    path: Assets/Main_game/Titl.unity
-    guid: 15244eba6787d184ba9fe4c07c74b611
-  - enabled: 1
     path: Assets/Main_game/mineSeen.unity
     guid: 81a6d110e0cc84044853093433909990
   - enabled: 1

@@ -19,7 +19,8 @@ public class TimingJudge : MonoBehaviour
 
     [Header("プレイヤーのライフ")]
     [SerializeField] private PlayerLifeController player;
-
+    [Header("敵のアニメーション")]
+    [SerializeField] private Animator enemyAnimator;
     private readonly string[] actionNames =
     {
         "通常",
@@ -27,7 +28,13 @@ public class TimingJudge : MonoBehaviour
         "れんぞく",
         "げきおも"
     };
-
+    private readonly string[] triggerNames =
+    {
+        "1", // 0: 通常
+        "2",  // 1: フェイント
+        "3",  // 2: れんぞく
+        "4"   // 3: げきおも
+    };
     private int currentZone = -1;
     private int correctZone = -1;
     private string enemyTechnique = "";
@@ -69,6 +76,7 @@ public class TimingJudge : MonoBehaviour
         timingBar.SetActive(true);
 
         actionText.text = "敵の技：" + enemyTechnique;
+        
     }
 
     // 防御終了
@@ -139,6 +147,10 @@ public class TimingJudge : MonoBehaviour
         {
             actionText.text = "防御失敗！";
             Debug.Log("防御失敗！");
+            if (enemyAnimator != null && correctZone >= 0 && correctZone < triggerNames.Length)
+            {
+                enemyAnimator.SetTrigger(triggerNames[correctZone]);
+            }
 
             // プレイヤーにダメージ
             player.TakeDamage();
