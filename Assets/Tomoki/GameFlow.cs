@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// アルファ版：mineSeen のゲーム全体の流れ（仕様書「ゲーム概要」「コスト仕様」「攻守決めフェーズ」）
+/// mineSeen のゲーム全体の流れ（仕様書「ゲーム概要」「コスト仕様」「攻守決めフェーズ」）
 ///
 ///  1. 攻守決め：疾風・剛腕・鉄壁から 1つ選ぶ（L スティック＋A）。相手（CPU）はランダム
 ///     勝てば先攻（攻撃から）、負ければ後攻（防御から）。あいこはやり直し
@@ -13,9 +13,9 @@ using UnityEngine.UI;
 ///     セットが変わったら、ライフとコストを元に戻す。次の攻撃はセットを取られた側から
 ///  4. 2セット先取で勝ち → 勝敗判定へ
 ///
-/// 【置き方】メニュー「DHUKUSI → mineSeen をアルファ版にする」で自動で置かれる
+/// 【置き方】メニュー「DHUKUSI → mineSeen をセットアップする」で自動で置かれる
 /// </summary>
-public class AlphaGameFlow : MonoBehaviour
+public class GameFlow : MonoBehaviour
 {
     [Header("画面")]
     [SerializeField] private PhaseUIManager ui;
@@ -67,7 +67,7 @@ public class AlphaGameFlow : MonoBehaviour
     private int sets1P, sets2P;
     private float elapsed;
     private bool inBattle;
-    /// <summary>攻撃・防御をしている間だけ true（攻守決めや勝敗の間は false）。AlphaBattleController が見る</summary>
+    /// <summary>攻撃・防御をしている間だけ true（攻守決めや勝敗の間は false）。BattleController が見る</summary>
     public static bool InBattle { get; private set; }
     private bool setEnding;
 
@@ -206,7 +206,7 @@ public class AlphaGameFlow : MonoBehaviour
         // 次のセット：ライフとコストを元に戻す
         SetLife(maxLife, maxLife);
         CostManager.Instance?.ResetAll();
-        FindFirstObjectByType<AlphaBattleController>()?.OnSetReset();
+        FindFirstObjectByType<BattleController>()?.OnSetReset();
         if (enemyResultTextField?.GetValue(enemy) is TMPro.TMP_Text rt) rt.text = $"第{sets1P + sets2P + 1}セット！";
         setEnding = false;
         UpdateHud();
@@ -229,12 +229,12 @@ public class AlphaGameFlow : MonoBehaviour
         // 仕様書「コスト仕様」：選択を始めたときのコスト（防御中は相手のコスト）。戦闘前は今のコスト
         if (costText != null && CostManager.Instance != null)
         {
-            costText.text = inBattle && AlphaBattleController.CostDisplay != null
-                ? AlphaBattleController.CostDisplay
+            costText.text = inBattle && BattleController.CostDisplay != null
+                ? BattleController.CostDisplay
                 : $"{CostManager.Instance.GetCurrentCost(0)}/{CostManager.Instance.MaxCost}";
             if (costLabel == null && costText.transform.parent != null)
                 costLabel = costText.transform.parent.Find("Cost_Label")?.GetComponent<Text>();
-            if (costLabel != null) costLabel.text = inBattle && AlphaBattleController.CostLabel != null ? AlphaBattleController.CostLabel : "残りコスト";
+            if (costLabel != null) costLabel.text = inBattle && BattleController.CostLabel != null ? BattleController.CostLabel : "残りコスト";
         }
     }
 

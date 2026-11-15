@@ -5,16 +5,16 @@ using UnityEngine;
 using UnityEngine.UI;
 
 /// <summary>
-/// mineSeen をアルファ版にする（コントローラー操作とコストを足す）
+/// mineSeen に戦闘の仕組みを入れる（コントローラー操作とコストを足す）
 ///
-/// メニュー「DHUKUSI → mineSeen をアルファ版にする」
+/// メニュー「DHUKUSI → mineSeen をセットアップする」
 ///  ・Gamemanager / Canvas / Player はそのまま使う（中身は変えない）
-///  ・AlphaSystem（DhukusiInput・CostManager・AlphaBattleController）を足す
-///  ・AlphaHUD（メッセージの表示）を足す
-///  ・DHUKUSI_Canvas（攻守決め・ライフ・セット・コストの画面）を足して、AlphaGameFlow で流れをつなぐ
+///  ・GameSystem（DhukusiInput・CostManager・BattleController）を足す
+///  ・GameHUD（メッセージの表示）を足す
+///  ・DHUKUSI_Canvas（攻守決め・ライフ・セット・コストの画面）を足して、GameFlow で流れをつなぐ
 ///  ・もう一度押すと、足した 3つだけ作り直す
 /// </summary>
-public static class DhukusiAlphaSetup
+public static class DhukusiSceneSetup
 {
     const string ScenePath = "Assets/Main_game/mineSeen.unity";
     const string FontPath  = "Assets/Fonts/DelaSukoGothicOne-R.ttf";
@@ -22,7 +22,7 @@ public static class DhukusiAlphaSetup
 
     static readonly Color Yamabuki = new Color32(0xf8, 0xb5, 0x00, 0xff);
 
-    [MenuItem("DHUKUSI/mineSeen をアルファ版にする")]
+    [MenuItem("DHUKUSI/mineSeen をセットアップする")]
     public static void Setup()
     {
         if (!EditorSceneManager.SaveCurrentModifiedScenesIfUserWantsTo()) return;
@@ -34,7 +34,7 @@ public static class DhukusiAlphaSetup
         var scene = EditorSceneManager.OpenScene(ScenePath, OpenSceneMode.Single);
 
         // 前に足したものは消して作り直す
-        foreach (var n in new[] { "AlphaSystem", "AlphaHUD", "DHUKUSI_Canvas", "GameStage" })
+        foreach (var n in new[] { "GameSystem", "GameHUD", "AlphaSystem", "AlphaHUD", "DHUKUSI_Canvas", "GameStage" })
         {
             var old = GameObject.Find(n);
             if (old != null) Object.DestroyImmediate(old);
@@ -44,7 +44,7 @@ public static class DhukusiAlphaSetup
         if (font == null) font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf");
 
         // ---- 表示（残りコスト・メッセージ）----
-        var hud = new GameObject("AlphaHUD", typeof(Canvas), typeof(CanvasScaler));
+        var hud = new GameObject("GameHUD", typeof(Canvas), typeof(CanvasScaler));
         var canvas = hud.GetComponent<Canvas>();
         canvas.renderMode = RenderMode.ScreenSpaceOverlay;
         canvas.sortingOrder = 10;
@@ -58,10 +58,10 @@ public static class DhukusiAlphaSetup
         msg.AddComponent<Outline>().effectColor = Color.black;
 
         // ---- しくみ ----
-        var system = new GameObject("AlphaSystem");
+        var system = new GameObject("GameSystem");
         system.AddComponent<DhukusiInput>();
         system.AddComponent<CostManager>();
-        var ctrl = system.AddComponent<AlphaBattleController>();
+        var ctrl = system.AddComponent<BattleController>();
 
         var so = new SerializedObject(ctrl);
         so.FindProperty("techniqueSelector").objectReferenceValue = Object.FindFirstObjectByType<TechiqueSelector>();
@@ -84,7 +84,7 @@ public static class DhukusiAlphaSetup
             mso.FindProperty("startPhase").enumValueIndex = (int)PhaseUIManager.UIPhase.None;
             mso.ApplyModifiedPropertiesWithoutUndo();
 
-            var flow = system.AddComponent<AlphaGameFlow>();
+            var flow = system.AddComponent<GameFlow>();
             var fso = new SerializedObject(flow);
             fso.FindProperty("ui").objectReferenceValue = manager;
             fso.FindProperty("koushuSelect").objectReferenceValue = ui.GetComponentInChildren<KoushuSelectUI>(true);
@@ -145,7 +145,7 @@ public static class DhukusiAlphaSetup
         EditorSceneManager.MarkSceneDirty(scene);
         EditorSceneManager.SaveScene(scene);
         Selection.activeGameObject = system;
-        Debug.Log("[DHUKUSI] mineSeen に AlphaSystem と AlphaHUD を足しました");
+        Debug.Log("[DHUKUSI] mineSeen に GameSystem と GameHUD を足しました");
     }
 
     // ===================== ステージ（Teams：背景モデリング「GameStage」）=====================
@@ -213,7 +213,7 @@ public static class DhukusiAlphaSetup
 
     // ===================== タイミングバー =====================
     //  攻撃の判定は「カーソルの位置が -40〜40」で成功（AttackTimingController に書いてある）。
-    //  仕様書は「選んだデュクシの範囲で押す」なので、判定は AlphaBattleController がやり直す（下の 4つの範囲を使う）
+    //  仕様書は「選んだデュクシの範囲で押す」なので、判定は BattleController がやり直す（下の 4つの範囲を使う）
     //  でもバーが x=140〜740 に置いてあって、カーソルも 140〜740 しか動かないので、絶対に成功しなかった。
     //  さらに Cursor に付いている TimingCursor（左右の端が逆）が同時にカーソルを動かして、カーソルが飛んでいた。
     //  → スクリプトは変えずに、シーンの中だけ直す
@@ -252,7 +252,7 @@ public static class DhukusiAlphaSetup
         }
 
         // 仕様書「デュクシ繰り出しフェーズ」：バーを 4つに分けて、左から 通常・フェイント・連続・激重
-        //  攻撃は「選んだデュクシの範囲」にカーソルがあるときに押すと成功（判定は AlphaBattleController）
+        //  攻撃は「選んだデュクシの範囲」にカーソルがあるときに押すと成功（判定は BattleController）
         var judge = Object.FindFirstObjectByType<TimingJudge>();
         var zonesProp = judge != null ? new SerializedObject(judge).FindProperty("successZones") : null;
         if (zonesProp != null && zonesProp.arraySize == 4)
@@ -355,7 +355,7 @@ public static class DhukusiAlphaSetup
             var p = new SerializedObject(attack).FindProperty("timingBar");
             if (p != null && p.objectReferenceValue is GameObject g) return g;
         }
-        Debug.LogWarning("[DHUKUSI] タイミングバーが見つかりません。AlphaSystem の Timing Bar に手で入れてください");
+        Debug.LogWarning("[DHUKUSI] タイミングバーが見つかりません。GameSystem の Timing Bar に手で入れてください");
         return null;
     }
 

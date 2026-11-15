@@ -6,7 +6,7 @@ using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.UI;
 
 /// <summary>
-/// アルファ版：mineSeen の戦闘を、コントローラーとコストで遊べるようにする
+/// mineSeen の戦闘を、コントローラーとコストで遊べるようにする
 ///
 /// Gamemanager の戦闘（技選択 → 攻撃タイミング → 敵の攻撃 → 防御タイミング）はそのまま使い、外から呼び出しているだけ。
 ///
@@ -20,7 +20,7 @@ using UnityEngine.UI;
 ///  ・防御：敵がどのデュクシを出すか読んで、同じデュクシのボタンを押す。当たれば防御成功、外れたらライフが減る
 ///  ・テスト用キーボード：1〜4 で技・防御（通常/フェイント/連続/激重）、Space で攻撃のタイミング
 /// </summary>
-public class AlphaBattleController : MonoBehaviour
+public class BattleController : MonoBehaviour
 {
     [Header("戦闘（自動で探す）")]
     [SerializeField] private TechiqueSelector techniqueSelector;
@@ -52,7 +52,7 @@ public class AlphaBattleController : MonoBehaviour
     //  ・防御中は相手（攻撃側）のコストを出す
     //  ・コストが 0 になったら、次の攻撃は「選択不可」で飛ばし、その次の攻撃で 10 に戻る
     //  ・セットが変わったら両方 10 から
-    public static string CostDisplay;   // HUD の「5/10」の所に出す文字（AlphaGameFlow が使う）
+    public static string CostDisplay;   // HUD の「5/10」の所に出す文字（GameFlow が使う）
     public static string CostLabel;     // HUD の「残りコスト」の所に出す文字
     private readonly bool[] skipped = new bool[2];   // [0]=自分 [1]=相手：コスト0で 1回休んだか
     private bool playerTurnStarted, defendingBefore, playerSkipping;
@@ -153,12 +153,12 @@ public class AlphaBattleController : MonoBehaviour
         if (input == null) input = FindFirstObjectByType<DhukusiInput>();
         if (input == null || CostManager.Instance == null)
         {
-            if (!warnedMissing) Debug.LogWarning("[アルファ] DhukusiInput か CostManager がシーンにありません。メニュー「DHUKUSI → mineSeen をアルファ版にする」を押し直してください");
+            if (!warnedMissing) Debug.LogWarning("[戦闘] DhukusiInput か CostManager がシーンにありません。メニュー「DHUKUSI → mineSeen をセットアップする」を押し直してください");
             warnedMissing = true;
             return;
         }
         // 攻守決め・勝敗の間は、技選択も防御も出さない（何もしない）
-        if (!AlphaGameFlow.InBattle)
+        if (!GameFlow.InBattle)
         {
             if (heldByBanner) { heldByBanner = false; }
             playerTurnStarted = false;
@@ -514,7 +514,7 @@ public class AlphaBattleController : MonoBehaviour
         return true;
     }
 
-    /// <summary>セットが変わったとき（AlphaGameFlow から呼ぶ）</summary>
+    /// <summary>セットが変わったとき（GameFlow から呼ぶ）</summary>
     public void OnSetReset()
     {
         skipped[0] = skipped[1] = false;

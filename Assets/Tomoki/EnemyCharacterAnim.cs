@@ -34,7 +34,7 @@ public class EnemyCharacterAnim : MonoBehaviour
         bool defending = (bool)defendingField.GetValue(judge);
         if (defending && !wasDefending)
         {
-            // AlphaBattleController が相手の技を払える技に変えることがあるので、1フレーム待ってから読む
+            // BattleController が相手の技を払える技に変えることがあるので、1フレーム待ってから読む
             Invoke(nameof(PlayAttack), 0.05f);
         }
         wasDefending = defending;
