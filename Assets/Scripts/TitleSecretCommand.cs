@@ -9,14 +9,23 @@ public class TitleSecretCommand : MonoBehaviour
     [Header("操作を有効にするプレイヤーのスクリプト")]
     public MonoBehaviour playerController;
 
-    [Header("有効にするカメラのスクリプト")] // ← 追加
+    [Header("有効にするカメラのスクリプト")]
     public MonoBehaviour cameraController;
 
     private bool isSecretActivated = false;
 
     void Update()
     {
-        if (!isSecretActivated && Keyboard.current != null && Keyboard.current.pKey.wasPressedThisFrame)
+        if (isSecretActivated) return;
+
+        // キーボードの「P」が押されたか
+        bool isPKeyPressed = Keyboard.current != null && Keyboard.current.pKey.wasPressedThisFrame;
+
+        // Xboxコントローラーの「LT（左トリガー）」が押されたか
+        bool isLTPressed = Gamepad.current != null && Gamepad.current.leftTrigger.wasPressedThisFrame;
+
+        // どちらか一方が押されたら発動
+        if (isPKeyPressed || isLTPressed)
         {
             ActivateSecretMode();
         }
@@ -36,7 +45,7 @@ public class TitleSecretCommand : MonoBehaviour
             playerController.enabled = true;
         }
 
-        if (cameraController != null) // ← 追加
+        if (cameraController != null)
         {
             cameraController.enabled = true;
         }

@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.InputSystem; // ← これを追加
+using UnityEngine.InputSystem;
 
 public class SimplePlayerMove : MonoBehaviour
 {
@@ -14,18 +14,28 @@ public class SimplePlayerMove : MonoBehaviour
 
     void Update()
     {
-        if (Keyboard.current == null) return;
-
-        // WASD と 矢印キー の入力を取得
         float h = 0f;
         float v = 0f;
 
-        if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) h -= 1f;
-        if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) h += 1f;
-        if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) v += 1f;
-        if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) v -= 1f;
+        // 1. キーボード入力（WASD と 矢印キー）
+        if (Keyboard.current != null)
+        {
+            if (Keyboard.current.aKey.isPressed || Keyboard.current.leftArrowKey.isPressed) h -= 1f;
+            if (Keyboard.current.dKey.isPressed || Keyboard.current.rightArrowKey.isPressed) h += 1f;
+            if (Keyboard.current.wKey.isPressed || Keyboard.current.upArrowKey.isPressed) v += 1f;
+            if (Keyboard.current.sKey.isPressed || Keyboard.current.downArrowKey.isPressed) v -= 1f;
+        }
 
-        Vector3 moveDir = new Vector3(h, 0, v).normalized;
+        // 2. ゲームパッド入力（左スティック）
+        if (Gamepad.current != null)
+        {
+            Vector2 stick = Gamepad.current.leftStick.ReadValue();
+            h += stick.x;
+            v += stick.y;
+        }
+
+        // キーボードとスティックを同時に触った時に速度が2倍にならないよう制限
+        Vector3 moveDir = Vector3.ClampMagnitude(new Vector3(h, 0, v), 1.0f);
 
         if (moveDir.magnitude >= 0.1f)
         {
