@@ -8,10 +8,8 @@ using UnityEngine.UI;
 /// <summary>
 /// mineSeen の戦闘を、コントローラーとコストで遊べるようにする
 ///
-/// Gamemanager の戦闘（技選択 → 攻撃タイミング → 敵の攻撃 → 防御タイミング）はそのまま使い、外から呼び出しているだけ。
-///
-///  ・技の選択（仕様書「デュクシ選択フェーズ(攻撃側)」）
-///      画面下の 4つのデュクシ（DHUKUSI_Canvas の Panel_DhukusiSelect_Attack）を使う
+///  
+///    画面下の 4つのデュクシ（DHUKUSI_Canvas の Panel_DhukusiSelect_Attack）を使う
 ///      Gamemanager の仮ボタン（ComboButton など）は隠す
 ///      Y（上）＝通常 / X（左）＝フェイント / B（右）＝連続 / A（下）＝激重
 ///      離したときに決定、2秒長押しでキャンセル。決定したら 0.1秒消える・0.1秒出るを 4回くり返してから攻撃へ
@@ -39,7 +37,7 @@ public class BattleController : MonoBehaviour
 
     private readonly List<GameObject> oldButtons = new List<GameObject>();
 
-    // 攻撃中・防御中かどうか（AttackTimingController / TimingJudge の中の状態を読む）
+    // 攻撃中・防御中かどうか
     private AttackTimingController attackTiming;
     private TimingJudge timingJudge;
     private System.Reflection.FieldInfo attackingField, defendingField;
@@ -47,17 +45,17 @@ public class BattleController : MonoBehaviour
     private GameObject defensePanel;
     private bool deciding;
 
-    // ---- コスト（仕様書「コスト仕様」）----
-    //  ・表示は「デュクシ選択を始めたときのコスト」（払った後も、次の選択まではそのまま）
+
+    //  ・表示は「デュクシ選択を始めたときのコスト」
     //  ・防御中は相手（攻撃側）のコストを出す
     //  ・コストが 0 になったら、次の攻撃は「選択不可」で飛ばし、その次の攻撃で 10 に戻る
     //  ・セットが変わったら両方 10 から
-    public static string CostDisplay;   // HUD の「5/10」の所に出す文字（GameFlow が使う）
-    public static string CostLabel;     // HUD の「残りコスト」の所に出す文字
-    private readonly bool[] skipped = new bool[2];   // [0]=自分 [1]=相手：コスト0で 1回休んだか
+    public static string CostDisplay;   
+    public static string CostLabel;     
+    private readonly bool[] skipped = new bool[2];   
     private bool playerTurnStarted, defendingBefore, playerSkipping;
 
-    // ---- 攻守が切り替わるときの大きい帯（「相手の攻撃！」「防御成功！」「あなたの攻撃！」など）----
+    //  攻守が切り替わるときの大きい帯「相手の攻撃！」「防御成功！」「あなたの攻撃！」
     private RectTransform bannerRoot, bannerBand;
     private Text bannerText;
     private Coroutine bannerCo;
@@ -190,7 +188,7 @@ public class BattleController : MonoBehaviour
             ShowGuide("");   // 防御の案内は右の吹き出しに出ている
             if (!defending)
             {
-                // 防御が終わった：結果を大きく出す（相手がコスト切れで休んだときは出さない）
+                // 防御が終わった：結果を大きく出す
                 if (!enemySkipFlag) ShowDefenseResult();
                 enemySkipFlag = false;
             }
@@ -202,17 +200,18 @@ public class BattleController : MonoBehaviour
             // 攻撃中はバーと重ならないように、案内をバーの下に出す
             if (messageText != null)
                 ((RectTransform)messageText.transform).anchoredPosition = new Vector2(0, attacking ? -190 : -75);
-            if (!attacking && wasAttacking) ShowAttackResult();   // 攻撃が終わった：結果を大きく出す
+            // 結果を大きく出す
+            if (!attacking && wasAttacking) ShowAttackResult();  
             wasAttacking = attacking;
         }
 
         // 技を選べるときだけ、下の 4つのデュクシを出す
-        // 攻撃の結果を出してから敵の攻撃が始まるまで（約2秒）は選べない
+        // 攻撃の結果を出してから敵の攻撃が始まるまでは選べない
         bool waitingEnemy = attackTiming != null && attackTiming.IsInvoking("StartEnemyDefense");
         bool selectReady = (input.Phase == DhukusiInput.InputPhase.Select || heldByBanner) && !isTiming && !waitingEnemy && !deciding;
 
         // 自分の攻撃ターン／相手の攻撃ターンが始まったとき、コストの処理をする
-        //  （前の帯が出ている間は待ってから、自分のターンを始める）
+        //  前の帯が出ている間は待ってから、自分のターンを始める
         if (!selectReady) playerTurnStarted = false;
         else if (!playerTurnStarted && !BannerBusy)
         {
@@ -222,7 +221,7 @@ public class BattleController : MonoBehaviour
         if (defending && !defendingBefore)
         {
             defendingBefore = true;
-            if (!BeginEnemyTurn()) return;   // 相手がコスト0で休んだ
+            if (!BeginEnemyTurn()) return;
         }
         if (!defending) defendingBefore = false;
 
@@ -244,19 +243,20 @@ public class BattleController : MonoBehaviour
             selectPanel.SetActive(canSelect || deciding);
         if (defensePanel != null && defensePanel.activeSelf != defending)
             defensePanel.SetActive(defending);
-        // タイミングバーは攻撃のときだけ出す（技選択中と、ボタンで読み合う防御中は隠す）
+        // タイミングバーは攻撃のときだけ出す
         if ((canSelect || defending) && timingBar != null && timingBar.activeSelf) timingBar.SetActive(false);
 
         TidyTexts(defending);
 
-        // ---- 防御：Y=通常 X=フェイント B=連続 A=激重（キーボードは 1〜4）----
-        if (defending && !BannerBusy)   // 「相手の攻撃！」が出ている間は押せない
+        //  防御：Y=通常 X=フェイント B=連続 A=激重（キーボードは 1〜4）
+        // 「相手の攻撃！」が出ている間は押せない
+        if (defending && !BannerBusy)  
         {
             int guard = ReadGuard();
             if (guard >= 0) Defend(guard);
         }
 
-        // ---- テスト用キーボード ----
+        //  テスト用キーボード 
         var kb = Keyboard.current;
         if (kb == null) return;
         if (canSelect && !deciding)
@@ -269,9 +269,9 @@ public class BattleController : MonoBehaviour
         if (attacking && kb.spaceKey.wasPressedThisFrame) OnTiming();
     }
 
-    // 文字が重ならないように整理する
-    //  ・防御中：「たいき」などの文字と「技を選んでください」は消して、案内だけ出す
-    //  ・それ以外：「防御成功！」「防御失敗！」のときだけ防御の文字を出す
+
+    //  防御中：「たいき」などの文字と「技を選んでください」は消して、案内だけ出す
+    //  それ以外：「防御成功！」「防御失敗！」のときだけ防御の文字を出す
     private TMPro.TMP_Text actionTmp, resultTmp;
     private float defenseEndTime = -100f;
     private bool warnedMissing;
@@ -285,7 +285,7 @@ public class BattleController : MonoBehaviour
 
         if (actionTmp != null)
         {
-            // 「防御成功！」「防御失敗！」は防御が終わってから 1.5秒だけ出す
+            // 「防御成功！」「防御失敗！」は防御が終わってから1.5秒だけ出す
             if (defending) defenseEndTime = -1f;
             else if (defenseEndTime < 0f) defenseEndTime = Time.time;
             bool showAction = false;   // 防御の結果は大きい帯で出す
@@ -320,7 +320,7 @@ public class BattleController : MonoBehaviour
         return -1;
     }
 
-    // 選んだデュクシの場所にカーソルを置いて判定する（敵と同じデュクシなら防御成功）
+    // 選んだデュクシの場所にカーソルを置いて判定する
     private void Defend(int guard)
     {
         const System.Reflection.BindingFlags f = System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic;
@@ -344,11 +344,11 @@ public class BattleController : MonoBehaviour
         messageText.text = text;
     }
 
-    // ===================== 帯 =====================
+    // 帯 
     private void ShowAttackResult()
     {
         bool ok = resultTmp != null && resultTmp.text.Contains("成功");
-        if (resultTmp != null) resultTmp.text = "";   // 同じことが小さい字でも出ないように
+        if (resultTmp != null) resultTmp.text = "";   
         ShowBanner(ok ? ("攻撃成功！", BannerYellow) : ("攻撃失敗…", BannerGray));
     }
 
@@ -358,7 +358,7 @@ public class BattleController : MonoBehaviour
         ShowBanner(ok ? ("防御成功！", BannerBlue) : ("防御失敗…", BannerRed));
     }
 
-    // 画面の真ん中に、黒い帯と大きい文字を 1つずつ出す（1つ 約0.9秒）
+    // 画面の真ん中に黒い帯と大きい文字
     private void ShowBanner(params (string text, Color color)[] items)
     {
         if (!EnsureBanner()) return;
@@ -374,7 +374,8 @@ public class BattleController : MonoBehaviour
         {
             bannerText.text = text;
             bannerText.color = color;
-            for (float t = 0f; t < 0.15f; t += Time.deltaTime)   // 帯が開いて、文字が大きい所から縮む
+            // 帯が開いて文字が大きい所から縮む
+            for (float t = 0f; t < 0.15f; t += Time.deltaTime)   
             {
                 float k = t / 0.15f;
                 bannerBand.localScale = new Vector3(1f, k, 1f);
@@ -386,7 +387,7 @@ public class BattleController : MonoBehaviour
             bannerText.rectTransform.localScale = Vector3.one;
             bannerText.canvasRenderer.SetAlpha(1f);
             yield return new WaitForSeconds(0.6f);
-            for (float t = 0f; t < 0.15f; t += Time.deltaTime)   // 閉じる
+            for (float t = 0f; t < 0.15f; t += Time.deltaTime)   
             {
                 float k = 1f - t / 0.15f;
                 bannerBand.localScale = new Vector3(1f, k, 1f);
@@ -439,7 +440,7 @@ public class BattleController : MonoBehaviour
         return true;
     }
 
-    // ===================== コスト =====================
+    // コスト
     private void BeginPlayerTurn()
     {
         var cm = CostManager.Instance;
@@ -457,7 +458,8 @@ public class BattleController : MonoBehaviour
                 return;
             }
             skipped[0] = false;
-            cm.RecoverIfEmpty(0);   // 1ターン休んだので 10 に戻る
+            // 1ターン休んだら10に戻る
+            cm.RecoverIfEmpty(0);   
         }
         CostLabel = "残りコスト";
         CostDisplay = $"{cm.GetCurrentCost(0)}/{cm.MaxCost}";
@@ -472,7 +474,7 @@ public class BattleController : MonoBehaviour
         if (enemyAttack != null) enemyAttack.StartEnemyAttack();
     }
 
-    // 相手の攻撃が始まったとき。相手もコストを払う（足りない技なら、払える技に変える）
+    // 相手の攻撃が始まったとき相手もコストを払う
     // 相手がコスト0で休むときは false
     private bool BeginEnemyTurn()
     {
@@ -487,7 +489,8 @@ public class BattleController : MonoBehaviour
                 skipped[1] = true;
                 CostLabel = "相手の残りコスト";
                 CostDisplay = "選択不可";
-                t.GetMethod("EndDefense", f)?.Invoke(timingJudge, null);   // ダメージなしで防御を終わる
+                // ダメージなしで防御を終わる
+                t.GetMethod("EndDefense", f)?.Invoke(timingJudge, null);   
                 enemySkipFlag = true;
                 ShowBanner(("相手はコスト切れ！ 攻撃なし", BannerGray));
                 return false;
@@ -533,7 +536,7 @@ public class BattleController : MonoBehaviour
         OnDecided(type);
     }
 
-    // コストを払えた技を、点滅させてから Gamemanager の技選択に渡す
+    // コストを払えた技を点滅させてから技選択に渡す
     private void OnDecided(DhukusiInput.DhukusiType type)
     {
         if (deciding) return;
@@ -544,7 +547,8 @@ public class BattleController : MonoBehaviour
     {
         deciding = true;
         attackType = System.Array.IndexOf(ZoneTypes, type);
-        DhukusiInput.Instance.Phase = DhukusiInput.InputPhase.None;   // 点滅中は入力しない
+        // 点滅中は入力しない
+        DhukusiInput.Instance.Phase = DhukusiInput.InputPhase.None;  
         yield return new WaitForSeconds(decideDelay);
         deciding = false;
         DhukusiInput.Instance.Phase = DhukusiInput.InputPhase.Select;
@@ -559,16 +563,15 @@ public class BattleController : MonoBehaviour
         }
     }
 
-    // タイミングボタン → マウスの左クリックとして送る（タイミング判定がクリックを見ているため）
+    //マウスの左クリック
     private void OnTiming()
     {
         if (IsAttacking()) StartCoroutine(AttackClick());
         else StartCoroutine(Click());
     }
 
-    // 仕様書：選んだデュクシの範囲（バーの 4つの色の 1つ）にカーソルがあるときに押すと攻撃成功
-    //  攻撃の判定のスクリプトは「真ん中 -40〜40 なら成功」なので、押した瞬間だけカーソルを
-    //  成功なら真ん中、失敗なら真ん中の外に置いてからクリックを送り、判定のあとで元の位置に戻す
+  
+    //  成功なら真ん中失敗なら真ん中の外に置いてからクリックを送り判定のあとで元の位置に戻す
     private bool attackClicking;
     private IEnumerator AttackClick()
     {
@@ -594,12 +597,13 @@ public class BattleController : MonoBehaviour
             cursor.anchoredPosition = p;
             yield return null;
         }
-        p = cursor.anchoredPosition; p.x = x;   // 見た目は押した場所に戻す
+        // 見た目は押した場所に戻す
+        p = cursor.anchoredPosition; p.x = x;   
         cursor.anchoredPosition = p;
         attackClicking = false;
     }
 
-    // カーソルがどのデュクシの範囲にあるか（無ければ -1）
+    // カーソルがどのデュクシの範囲にあるか
     private static int ZoneAt(RectTransform[] zones, float x)
     {
         if (zones == null) return -1;
