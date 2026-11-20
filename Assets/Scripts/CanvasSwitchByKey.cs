@@ -55,36 +55,26 @@ public class CanvasSwitchByKey : MonoBehaviour
 
     private void Update()
     {
-        // すでに切り替え済みの場合は入力を受け付けない
-        if (isSwitched) return;
-
-        // マウスの左クリックは従来通りの単押し挙動（※もしマウスも制限したい場合はここを書き換えます）
-        if (Mouse.current != null && Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            SwitchCanvas();
-            return;
-        }
-
-        // --- ゲームパッド（Bボタン）の長押し判定処理 ---
+        
+        // --- ゲームパッド（下ボタン：buttonSouth）の長押し判定処理 ---
         if (Gamepad.current != null)
         {
-            // Bボタンが押された瞬間
-            if (Gamepad.current.buttonEast.wasPressedThisFrame)
+            // 下ボタンが押された瞬間
+            if (Gamepad.current.buttonSouth.wasPressedThisFrame)
             {
                 isHolding = true;
                 isCancelled = false;
                 buttonPressedTime = 0f;
             }
 
-            // Bボタンが押され続けている間
-            if (isHolding && Gamepad.current.buttonEast.isPressed)
+            // 下ボタンが押され続けている間
+            if (isHolding && Gamepad.current.buttonSouth.isPressed)
             {
                 buttonPressedTime += Time.deltaTime;
 
-                // ゲージUIの更新（0.5秒〜3秒の間でゲージをチャージする演出）
+                // ゲージUIの更新
                 if (holdProgressImage != null)
                 {
-                    // 0.5秒未満のときは0、それ以降3秒にかけて1.0に近づく
                     float progress = Mathf.InverseLerp(minHoldDuration, cancelHoldDuration, buttonPressedTime);
                     holdProgressImage.fillAmount = progress;
                 }
@@ -97,12 +87,11 @@ public class CanvasSwitchByKey : MonoBehaviour
                 }
             }
 
-            // Bボタンが離された瞬間
-            if (Gamepad.current.buttonEast.wasReleasedThisFrame)
+            // 下ボタンが離された瞬間（※ここを buttonSouth に修正）
+            if (Gamepad.current.buttonSouth.wasReleasedThisFrame)
             {
                 if (isHolding)
                 {
-                    // 【修正点】0.5秒以上、かつ3秒未満で離された場合のみ実行
                     if (!isCancelled && buttonPressedTime >= minHoldDuration && buttonPressedTime < cancelHoldDuration)
                     {
                         SwitchCanvas();
@@ -117,6 +106,7 @@ public class CanvasSwitchByKey : MonoBehaviour
                 }
             }
         }
+
     }
 
     private void ResetHoldState()

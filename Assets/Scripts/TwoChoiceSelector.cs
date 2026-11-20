@@ -96,38 +96,44 @@ public class TwoChoiceSelector : MonoBehaviour
 
         if (Gamepad.current != null)
         {
-            if (Gamepad.current.buttonEast.wasPressedThisFrame)
+            if (Gamepad.current != null)
             {
-                isHolding = true;
-                isCancelled = false;
-                buttonPressedTime = 0f;
-            }
-
-            if (isHolding && Gamepad.current.buttonEast.isPressed)
-            {
-                buttonPressedTime += Time.deltaTime;
-
-                if (holdProgressImage != null)
+                // ★ buttonEast を buttonSouth（下ボタン）に変更
+                if (Gamepad.current.buttonSouth.wasPressedThisFrame)
                 {
-                    float progress = Mathf.InverseLerp(minHoldDuration, cancelHoldDuration, buttonPressedTime);
-                    holdProgressImage.fillAmount = progress;
+                    isHolding = true;
+                    isCancelled = false;
+                    buttonPressedTime = 0f;
                 }
 
-                if (buttonPressedTime >= cancelHoldDuration && !isCancelled)
+                // ★ buttonEast を buttonSouth（下ボタン）に変更
+                if (isHolding && Gamepad.current.buttonSouth.isPressed)
                 {
-                    isCancelled = true;
-                }
-            }
+                    buttonPressedTime += Time.deltaTime;
 
-            if (Gamepad.current.buttonEast.wasReleasedThisFrame)
-            {
-                if (isHolding)
-                {
-                    if (!isCancelled && buttonPressedTime >= minHoldDuration && buttonPressedTime < cancelHoldDuration)
+                    if (holdProgressImage != null)
                     {
-                        StartCoroutine(BlinkSelectedImage());
+                        float progress = Mathf.InverseLerp(minHoldDuration, cancelHoldDuration, buttonPressedTime);
+                        holdProgressImage.fillAmount = progress;
                     }
-                    ResetHoldState();
+
+                    if (buttonPressedTime >= cancelHoldDuration && !isCancelled)
+                    {
+                        isCancelled = true;
+                    }
+                }
+
+                // ★ buttonEast を buttonSouth（下ボタン）に変更
+                if (Gamepad.current.buttonSouth.wasReleasedThisFrame)
+                {
+                    if (isHolding)
+                    {
+                        if (!isCancelled && buttonPressedTime >= minHoldDuration && buttonPressedTime < cancelHoldDuration)
+                        {
+                            StartCoroutine(BlinkSelectedImage());
+                        }
+                        ResetHoldState();
+                    }
                 }
             }
         }
